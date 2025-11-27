@@ -43,7 +43,7 @@ export const createProductStockSchema = z.object({
     buyingPrice: positiveNumber("Buying price"),
     type: z.preprocess(
         (val) => String(val).toUpperCase(),
-        z.enum(["PURCHASE", "SUPPLIER_RETURN"], {
+        z.enum(["PURCHASE", "SUPPLIER"], {
             error: "Stock Create Purpose is required",
         })
     ),

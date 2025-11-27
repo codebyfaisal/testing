@@ -42,7 +42,7 @@ export const getInvestments = async (where, { page, limit }) => {
     })
 };
 
-export const createInvestment = async (data, next) => {
+export const createInvestment = async (data) => {
     return await prisma.$transaction(async (tx) => {
         const { date } = data;
         const currentInvMonth = new Date(date).getMonth();
@@ -58,7 +58,7 @@ export const createInvestment = async (data, next) => {
         });
 
         if (investmentExist)
-            return next(new AppError(`Investment for ${dayjs(date).format("MMM")} ${currentInvYear} already exists.`, 400));
+            throw new AppError(`Investment for ${dayjs(date).format("MMM")} ${currentInvYear} already exists.`, 400);
 
         const investment = await tx.investment.create({ data });
         return investment

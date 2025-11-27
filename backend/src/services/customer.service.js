@@ -91,12 +91,10 @@ export const updateCustomer = async (data) =>
         data,
     });
 
-export const deleteCustomer = async (id, next) => {
+export const deleteCustomer = async (id) => {
     const hasSales = await prisma.sale.count({
         where: { customerId: id },
     });
-
-    console.log(hasSales);
 
     if (hasSales > 0)
         throw new AppError("Cannot delete customer.\nWhen it is linked to one or more sales.", 409)

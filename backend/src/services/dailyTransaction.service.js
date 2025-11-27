@@ -56,7 +56,7 @@ export const createDailyTransaction = async (data) => {
     });
 }
 
-export const updateDailyTransaction = async (data, next) => {
+export const updateDailyTransaction = async (data) => {
     return await prisma.$transaction(async (tx) => {
         const transaction = await tx.manualTransaction.update({
             where: { id: data.id },
@@ -74,7 +74,7 @@ export const updateDailyTransaction = async (data, next) => {
 }
 
 
-export const deleteDailyTransaction = async (id, next) => {
+export const deleteDailyTransaction = async (id) => {
     return await prisma.$transaction(async (tx) => {
         const transaction = await tx.manualTransaction.delete({ where: { id } });
 

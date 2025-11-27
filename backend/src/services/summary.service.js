@@ -10,7 +10,6 @@ const { Decimal } = pkg;
 
 const getInvestment = async (tx, { sm, sy }) => {
     const startDate = new Date(sy, sm - 1, 1);
-    // FIX: Use 1st of NEXT month to capture full current month
     const endDate = new Date(sy, sm, 1);
 
     return await tx.investment.findFirst({

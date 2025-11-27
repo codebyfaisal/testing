@@ -40,7 +40,7 @@ export const createHandler = (schema, serviceFn, resourceName) => {
         if (!parseResult.success)
             return next(new AppError(zodError(parseResult), 400));
 
-        const [error, result] = await catchError(serviceFn(parseResult.data, next));
+        const [error, result] = await catchError(serviceFn(parseResult.data));
         if (error instanceof Prisma.PrismaClientKnownRequestError)
             switch (error.code) {
                 case "P2002":
@@ -64,7 +64,7 @@ export const updateHandler = (schema, serviceFn, resourceName) => {
         if (!parseResult.success)
             return next(new AppError(zodError(parseResult), 400));
 
-        const [error, result] = await catchError(serviceFn(parseResult.data, next));
+        const [error, result] = await catchError(serviceFn(parseResult.data));
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
             switch (error.code) {
                 case "P2025":
@@ -72,7 +72,7 @@ export const updateHandler = (schema, serviceFn, resourceName) => {
                 case "P2002":
                     return next(new AppError(`${resourceName} already exists`, 409));
                 case "P2003":
-                    return next(new AppError("Foreign key constraint failed", 409));
+                    return next(new AppError("Linked resource found. please delete it first", 409));
             }
         }
         if (error) return next(error);
@@ -87,7 +87,7 @@ export const deleteHandler = (schema, serviceFn, resourceName) => {
         if (!parseResult.success)
             return next(new AppError(zodError(parseResult), 400));
 
-        const [error, result] = await catchError(serviceFn(parseResult.data, next));
+        const [error, result] = await catchError(serviceFn(parseResult.data));
         if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2025")
             return next(new AppError(`${resourceName} not found`, 404));
 

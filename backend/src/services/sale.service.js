@@ -3,7 +3,7 @@ import prisma from "../db/prisma.js";
 import AppError from "../utils/error.util.js";
 import pkg from "@prisma/client";
 import dayjs from "dayjs";
-import { recalculateSummaries } from "./summary.service.js"; 
+import { recalculateSummaries } from "./summary.service.js";
 
 const { Decimal } = pkg;
 
@@ -106,7 +106,7 @@ export const getSale = async (id) => {
     });
 };
 
-export const crtSale = async (tx, data, next) => {
+export const crtSale = async (tx, data) => {
     let {
         agreementNo: id,
         saleDate,
@@ -153,12 +153,12 @@ export const crtSale = async (tx, data, next) => {
         remainingAmount = totalAmount.sub(discount).sub(paidAmountTotal);
 
         if (totalInstallments < 1)
-            return next(new AppError("At least one installment is required", 400));
+            throw new AppError("At least one installment is required", 400);
 
         const remainingInstallmentsCount = totalInstallments - 1;
 
         if (remainingInstallmentsCount < 0)
-            return next(new AppError("Total installments must be greater than or equal to the paid installments.", 400));
+            throw new AppError("Total installments must be greater than or equal to the paid installments.", 400);
 
         if (remainingInstallmentsCount > 0) {
             perInstallment = remainingAmount.div(remainingInstallmentsCount);
@@ -172,25 +172,20 @@ export const crtSale = async (tx, data, next) => {
     }
 
     if (paidAmountTotal.gt(totalAmount))
-        return next(new AppError("Paid amount cannot be greater than total amount", 400));
+        throw new AppError("Paid amount cannot be greater than total amount", 400);
     if (discount.gt(totalAmount))
-        return next(new AppError("Discount cannot be greater than total amount", 400));
+        throw new AppError("Discount cannot be greater than total amount", 400);
 
     const initialStockTx = product.stockTransaction.find((t) => t.initial);
     const productPurchaseDate = initialStockTx?.date;
     if (productPurchaseDate && productPurchaseDate > saleDate)
-        return next(
-            new AppError(
-                `Sale date cannot be before ${productPurchaseDate.toLocaleDateString()} product purchase date`,
-                400
-            )
-        );
+        throw new AppError(`Sale date cannot be before ${productPurchaseDate.toLocaleDateString()} product purchase date`, 400);
 
     if (discount.isNegative())
-        return next(new AppError("Discount cannot be negative", 400));
+        throw new AppError("Discount cannot be negative", 400);
 
     if (product.stockQuantity < quantity)
-        return next(new AppError(`Not enough stock available max available quantity is ${product.stockQuantity}`, 400));
+        throw new AppError(`Not enough stock available max available quantity is ${product.stockQuantity}`, 400);
 
     const buyingPrice = await tx.stockTransaction.findMany({
         where: {
@@ -254,7 +249,7 @@ export const crtSale = async (tx, data, next) => {
 
                 const dueDateObj = dayjs(today).add(i + 1, 'month');
                 const dueDate = dueDateObj.toDate();
-                
+
                 let status = "UPCOMING";
                 if (dueDateObj.isSame(now, 'month') && dueDateObj.isSame(now, 'year')) {
                     status = "PENDING";
@@ -304,15 +299,15 @@ export const crtSale = async (tx, data, next) => {
     return sale;
 };
 
-export const createSale = async (data, next) =>
+export const createSale = async (data) =>
     await prisma.$transaction(async (tx) =>
-        await crtSale(tx, data, next)
+        await crtSale(tx, data)
     );
 
 export const updateSale = async (data) => {
     return await prisma.$transaction(async (tx) => {
         const oldSale = await tx.sale.findUnique({ where: { id: data.id } });
-        
+
         const updatedSale = await tx.sale.update({
             where: { id: data.id },
             data,
@@ -321,14 +316,14 @@ export const updateSale = async (data) => {
         const datesToUpdate = [];
         if (oldSale && oldSale.saleDate) datesToUpdate.push(oldSale.saleDate);
         if (updatedSale.saleDate) datesToUpdate.push(updatedSale.saleDate);
-        
+
         await recalculateSummaries(tx, datesToUpdate);
 
         return updatedSale;
     });
 };
 
-export const deleteSale = async (saleId, next) => {
+export const deleteSale = async (saleId) => {
     return await prisma.$transaction(async (tx) => {
         const sale = await tx.sale.findUnique({
             where: { id: saleId },
@@ -374,7 +369,7 @@ export const deleteSale = async (saleId, next) => {
             });
         }
         await recalculateSummaries(tx, datesToUpdate);
-       
+
         return deletedSale;
     });
 };

@@ -9,6 +9,8 @@ const errorMiddleware = (err, req, res, next) => {
         status = 503;
         message = "Database connection failed. Please try again or Run the database or Restart the application. If the problem persists, Contact Developer.";
     };
+
+    console.log(err);
     
     return errorRes(res, status, message);
 };

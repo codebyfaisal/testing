@@ -48,7 +48,7 @@ const calculateSaleAmounts = (sale, paidInstallments, amount = 0) => {
     };
 };
 
-export const payInstallment = async ({ id: saleId, paidDate, amount }, next) => {
+export const payInstallment = async ({ id: saleId, paidDate, amount }) => {
     return await prisma.$transaction(async (tx) => {
         const paymentDate = new Date(paidDate);
         const paymentAmount = new Decimal(amount);
@@ -66,12 +66,11 @@ export const payInstallment = async ({ id: saleId, paidDate, amount }, next) => 
         if (!sale) throw new AppError("Sale not found.", 404);
         if (sale.status === "COMPLETED") throw new AppError("Sale is already completed.", 400);
         if (paymentAmount.lte(0)) throw new AppError("Payment amount must be greater than zero.", 400);
-        // if (paymentDate > new Date()) return next(new AppError("Paid date cannot be in the future.", 400));
+        // if (paymentDate > new Date()) throw new AppError("Paid date cannot be in the future.", 400);
 
         const totalDebt = new Decimal(sale.remainingAmount);
-        if (paymentAmount.gt(totalDebt)) {
-            return next(new AppError(`Payment amount (${paymentAmount.toNumber()}) exceeds remaining debt (${totalDebt.toNumber()}).`, 400));
-        }
+        if (paymentAmount.gt(totalDebt))
+            throw new AppError(`Payment amount (${paymentAmount.toNumber()}) exceeds remaining debt (${totalDebt.toNumber()}).`, 400);
 
         const paidInstallments = sale.installments.filter(i => i.status === "PAID" || i.status === "PAID_LATE");
         const nextInstallments = sale.installments.filter(i => i.status === "UPCOMING" || i.status === "LATE" || i.status === "PENDING");
@@ -122,11 +121,10 @@ export const payInstallment = async ({ id: saleId, paidDate, amount }, next) => 
             const now = dayjs();
 
             let nextStatus = "UPCOMING";
-            if (nextDueDate.isSame(now, 'month') && nextDueDate.isSame(now, 'year')) {
+            if (nextDueDate.isSame(now, 'month') && nextDueDate.isSame(now, 'year'))
                 nextStatus = "PENDING";
-            } else if (nextDueDate.isBefore(now, 'day')) {
+            else if (nextDueDate.isBefore(now, 'day'))
                 nextStatus = "LATE";
-            }
 
             await tx.installment.create({
                 data: {
@@ -147,27 +145,27 @@ export const payInstallment = async ({ id: saleId, paidDate, amount }, next) => 
 
         // --- RECALCULATE SUMMARY (OPTION 3) ---
         await recalculateSummaries(tx, [paymentDate]);
-      
+
         return updatedSale;
     });
 };
 
-export const updateInstallment = async ({ id, amount, paidDate }, next) => {
+export const updateInstallment = async ({ id, amount, paidDate }) => {
     return await prisma.$transaction(async (tx) => {
         const installment = await tx.installment.findUnique({
             where: { id },
             include: { sale: true },
         });
 
-        if (!installment) return next(new AppError("Installment not found.", 404));
+        if (!installment) throw new AppError("Installment not found.", 404);
 
         const sale = installment.sale;
-        const oldPaidDate = installment.paidDate; 
+        const oldPaidDate = installment.paidDate;
         if (sale.status === "COMPLETED")
-            return next(new AppError("Sale is already completed.", 400));
+            throw new AppError("Sale is already completed.", 400);
 
         if (installment.status !== "PAID" && installment.status !== "PAID_LATE")
-            return next(new AppError("Only PAID installments can be edited.", 400));
+            throw new AppError("Only PAID installments can be edited.", 400);
 
         const newPaymentAmount = new Decimal(amount);
         const oldPaymentAmount = new Decimal(installment.amount);
@@ -202,7 +200,7 @@ export const updateInstallment = async ({ id, amount, paidDate }, next) => {
         const datesToUpdate = [newPaymentDate];
         if (oldPaidDate) datesToUpdate.push(oldPaidDate);
         await recalculateSummaries(tx, datesToUpdate);
-        
+
         return updatedSale;
     });
 };
@@ -266,7 +264,6 @@ export const getInstallments = async (
                 dueDate: i.dueDate,
             };
 
-            // Calculate days for UI logic
             if (status === "UPCOMING" || status === "PENDING") {
                 const daysUntilDue = Math.max(
                     0,

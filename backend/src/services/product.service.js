@@ -43,7 +43,7 @@ export const getProduct = async (id) =>
         }
     })
 
-export const getProductDetails = async (id, next) => {
+export const getProductDetails = async (id) => {
     try {
         const product = await prisma.product.findUnique({
             where: { id: Number(id) },
@@ -57,7 +57,7 @@ export const getProductDetails = async (id, next) => {
             },
         });
 
-        if (!product) return next(new AppError("Product not found", 404));
+        if (!product) throw new AppError("Product not found", 404);
 
         const productOverview = {
             id: product.id,
@@ -119,7 +119,7 @@ export const getProductDetails = async (id, next) => {
             salesSummary,
         };
     } catch (err) {
-        return next(new AppError(err.message, 500));
+        throw new AppError(err.message, 500);
     }
 };
 
@@ -148,12 +148,12 @@ export const crtProduct = async (tx, data) => {
     return product
 }
 
-export const createProduct = async (data, next) =>
+export const createProduct = async (data) =>
     await prisma.$transaction(async (tx) =>
         await crtProduct(tx, data)
     );
 
-export const updateProduct = async (data, next) => {
+export const updateProduct = async (data) => {
     return await prisma.$transaction(async (tx) => {
         const { id, sellingPrice, ...updateData } = data;
 
@@ -177,14 +177,14 @@ export const updateProduct = async (data, next) => {
 }
 
 
-export const deleteProduct = async (id, next) => {
+export const deleteProduct = async (id) => {
     return await prisma.$transaction(async (tx) => {
         const hasSales = await tx.sale.count({
             where: { productId: id },
         });
 
         if (hasSales > 0)
-            return next(new AppError("Cannot delete product: When it is linked to one or more sales.", 409));
+            throw new AppError("Cannot delete product: When it is linked to one or more sales.", 409);
 
         await tx.stockTransaction.deleteMany({
             where: { productId: id },
