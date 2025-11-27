@@ -1,8 +1,10 @@
-// /..\backend\src\services\installment.service.js
+// backend/src/services/installment.service.js
 import prisma from "../db/prisma.js";
 import AppError from "../utils/error.util.js";
 import dayjs from "dayjs";
 import pkg from "@prisma/client";
+import { recalculateSummaries } from "./summary.service.js";
+
 const { Decimal } = pkg;
 
 const saleInclude = {
@@ -61,10 +63,10 @@ export const payInstallment = async ({ id: saleId, paidDate, amount }, next) => 
             },
         });
 
-        if (!sale) return next(new AppError("Sale not found.", 404));
-        if (sale.status === "COMPLETED") return next(new AppError("Sale is already completed.", 400));
-        if (paymentAmount.lte(0)) return next(new AppError("Payment amount must be greater than zero.", 400));
-        if (paymentDate > new Date()) return next(new AppError("Paid date cannot be in the future.", 400));
+        if (!sale) throw new AppError("Sale not found.", 404);
+        if (sale.status === "COMPLETED") throw new AppError("Sale is already completed.", 400);
+        if (paymentAmount.lte(0)) throw new AppError("Payment amount must be greater than zero.", 400);
+        // if (paymentDate > new Date()) return next(new AppError("Paid date cannot be in the future.", 400));
 
         const totalDebt = new Decimal(sale.remainingAmount);
         if (paymentAmount.gt(totalDebt)) {
@@ -72,7 +74,7 @@ export const payInstallment = async ({ id: saleId, paidDate, amount }, next) => 
         }
 
         const paidInstallments = sale.installments.filter(i => i.status === "PAID" || i.status === "PAID_LATE");
-        const nextInstallments = sale.installments.filter(i => i.status === "UPCOMING" || i.status === "LATE");
+        const nextInstallments = sale.installments.filter(i => i.status === "UPCOMING" || i.status === "LATE" || i.status === "PENDING");
 
         let installmentToPay = nextInstallments[0];
 
@@ -93,13 +95,13 @@ export const payInstallment = async ({ id: saleId, paidDate, amount }, next) => 
         const newSaleStatus = newRemainingAmount.lte(0) ? "COMPLETED" : "ACTIVE";
 
         await tx.installment.updateMany({
-            where: { saleId, status: "UPCOMING", dueDate: { lt: dayjs().startOf('day').toDate() } },
+            where: { saleId, status: { in: ["UPCOMING", "PENDING"] }, dueDate: { lt: dayjs().startOf('day').toDate() } },
             data: { status: "LATE" },
         });
 
         if (newSaleStatus === "COMPLETED") {
             await tx.installment.updateMany({
-                where: { saleId, status: { in: ["UPCOMING", "LATE"] } },
+                where: { saleId, status: { in: ["UPCOMING", "LATE", "PENDING"] } },
                 data: {
                     amount: 0,
                     status: "PAID",
@@ -116,28 +118,43 @@ export const payInstallment = async ({ id: saleId, paidDate, amount }, next) => 
         }
 
         if (newSaleStatus !== "COMPLETED" && nextInstallments.length === 1) {
+            const nextDueDate = dayjs(installmentToPay.dueDate).add(1, 'month');
+            const now = dayjs();
+
+            let nextStatus = "UPCOMING";
+            if (nextDueDate.isSame(now, 'month') && nextDueDate.isSame(now, 'year')) {
+                nextStatus = "PENDING";
+            } else if (nextDueDate.isBefore(now, 'day')) {
+                nextStatus = "LATE";
+            }
+
             await tx.installment.create({
                 data: {
                     saleId: saleId,
                     amount: newRemainingAmount.toNumber(),
-                    dueDate: dayjs(installmentToPay.dueDate).add(1, 'month').toDate(),
-                    status: "UPCOMING"
+                    dueDate: nextDueDate.toDate(),
+                    status: nextStatus
                 }
             })
             updatedSaleData.totalInstallments = { increment: 1 };
         }
 
-        return await tx.sale.update({
+        const updatedSale = await tx.sale.update({
             where: { id: saleId },
             data: updatedSaleData,
             include: saleInclude,
         });
+
+        // --- RECALCULATE SUMMARY (OPTION 3) ---
+        await recalculateSummaries(tx, [paymentDate]);
+      
+        return updatedSale;
     });
 };
 
 export const updateInstallment = async ({ id, amount, paidDate }, next) => {
     return await prisma.$transaction(async (tx) => {
-       const installment = await tx.installment.findUnique({
+        const installment = await tx.installment.findUnique({
             where: { id },
             include: { sale: true },
         });
@@ -145,7 +162,7 @@ export const updateInstallment = async ({ id, amount, paidDate }, next) => {
         if (!installment) return next(new AppError("Installment not found.", 404));
 
         const sale = installment.sale;
-
+        const oldPaidDate = installment.paidDate; 
         if (sale.status === "COMPLETED")
             return next(new AppError("Sale is already completed.", 400));
 
@@ -171,7 +188,7 @@ export const updateInstallment = async ({ id, amount, paidDate }, next) => {
 
         const newSaleStatus = newSaleRemaining.lte(0) ? "COMPLETED" : "ACTIVE";
 
-        return await tx.sale.update({
+        const updatedSale = await tx.sale.update({
             where: { id: sale.id },
             data: {
                 paidAmount: newSalePaidAmount.toNumber(),
@@ -180,6 +197,13 @@ export const updateInstallment = async ({ id, amount, paidDate }, next) => {
             },
             include: saleInclude,
         });
+
+        // --- RECALCULATE SUMMARY (OPTION 3) ---
+        const datesToUpdate = [newPaymentDate];
+        if (oldPaidDate) datesToUpdate.push(oldPaidDate);
+        await recalculateSummaries(tx, datesToUpdate);
+        
+        return updatedSale;
     });
 };
 
@@ -190,18 +214,24 @@ export const getInstallments = async (
     return await prisma.$transaction(async (tx) => {
         let whereCondition = {};
         const todayStart = dayjs().startOf("day").toDate();
-        const tenDaysFromNowEnd = dayjs().add(10, "day").endOf("day").toDate();
 
         if (status === "UPCOMING") {
+            const tenDaysFromNowEnd = dayjs().add(10, "day").endOf("day").toDate();
+
             whereCondition = {
-                status: "UPCOMING",
+                status: { in: ["UPCOMING", "PENDING"] },
                 dueDate: {
                     gte: todayStart,
                     lte: tenDaysFromNowEnd,
                 },
             };
-        } else if (status === "LATE") whereCondition = { status: "LATE" };
-        else throw new Error("Invalid status. Must be either 'UPCOMING' or 'LATE'.");
+        } else if (status === "PENDING") {
+            whereCondition = { status: "PENDING" };
+        } else if (status === "LATE") {
+            whereCondition = { status: "LATE" };
+        } else {
+            whereCondition = { status: status };
+        }
 
         const installments = await tx.installment.findMany({
             where: whereCondition,
@@ -236,14 +266,15 @@ export const getInstallments = async (
                 dueDate: i.dueDate,
             };
 
-            if (status === "UPCOMING") {
+            // Calculate days for UI logic
+            if (status === "UPCOMING" || status === "PENDING") {
                 const daysUntilDue = Math.max(
                     0,
-                    Math.floor(dayjs(i.dueDate).diff(dayjs(), "day", true))
+                    Math.ceil(dayjs(i.dueDate).diff(dayjs(), "day", true))
                 );
                 return {
                     ...base,
-                    status: "UPCOMING",
+                    status: i.status,
                     schedule: `${i.sale.paidInstallments + 1}/${i.sale.totalInstallments}`,
                     daysUntilDue,
                 };
@@ -251,7 +282,7 @@ export const getInstallments = async (
                 const daysOverdue = Math.max(0, dayjs().diff(i.dueDate, "day"));
                 return {
                     ...base,
-                    status: "LATE",
+                    status: i.status,
                     daysOverdue,
                 };
             }
@@ -263,11 +294,26 @@ export const getInstallments = async (
 
 export const updateAllOverdueStatus = async () => {
     const todayStart = dayjs().startOf('day').toDate();
+    const currentMonthStart = dayjs().startOf('month').toDate();
+    const currentMonthEnd = dayjs().endOf('month').toDate();
 
     return await prisma.$transaction(async (tx) => {
-        const updateResult = await tx.installment.updateMany({
+        const pendingUpdate = await tx.installment.updateMany({
             where: {
                 status: "UPCOMING",
+                dueDate: {
+                    gte: currentMonthStart,
+                    lte: currentMonthEnd
+                }
+            },
+            data: {
+                status: "PENDING",
+            },
+        });
+
+        const lateUpdate = await tx.installment.updateMany({
+            where: {
+                status: { in: ["UPCOMING", "PENDING"] },
                 dueDate: { lt: todayStart }
             },
             data: {
@@ -276,8 +322,8 @@ export const updateAllOverdueStatus = async () => {
         });
 
         return {
-            count: updateResult.count,
-            message: `${updateResult.count} installment(s) successfully marked as LATE.`
+            count: pendingUpdate.count + lateUpdate.count,
+            message: `${pendingUpdate.count} updated to PENDING, ${lateUpdate.count} updated to LATE.`
         };
     });
 };

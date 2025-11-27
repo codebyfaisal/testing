@@ -1,5 +1,6 @@
 // /..\backend\src\services\manualTransaction.service.js
 import prisma from "../db/prisma.js";
+import { recalculateSummaries } from "./summary.service.js";
 
 export const getDailyTransactions = async (where, { page, limit }) => {
     const { startDate, endDate, ...otherFilters } = where;
@@ -39,14 +40,47 @@ export const getDailyTransactions = async (where, { page, limit }) => {
     })
 };
 
-export const createDailyTransaction = async (data) =>
-    await prisma.manualTransaction.create({ data });
+export const createDailyTransaction = async (data) => {
+    return await prisma.$transaction(async (tx) => {
+        const transaction = await tx.manualTransaction.create({
+            data: {
+                ...data,
+                date: new Date(data.date),
+            },
+        });
 
-export const updateDailyTransaction = async (data, next) =>
-    await prisma.manualTransaction.update({
-        where: { id: data.id },
-        data
+        if (transaction.type === 'EXPENSE')
+            await recalculateSummaries(tx, [transaction.date]);
+
+        return transaction;
     });
+}
 
-export const deleteDailyTransaction = async (id, next) =>
-    await prisma.manualTransaction.delete({ where: { id } });
+export const updateDailyTransaction = async (data, next) => {
+    return await prisma.$transaction(async (tx) => {
+        const transaction = await tx.manualTransaction.update({
+            where: { id: data.id },
+            data: {
+                ...data,
+                date: new Date(data.date),
+            },
+        });
+
+        if (transaction.type === 'EXPENSE')
+            await recalculateSummaries(tx, [transaction.date]);
+
+        return transaction;
+    });
+}
+
+
+export const deleteDailyTransaction = async (id, next) => {
+    return await prisma.$transaction(async (tx) => {
+        const transaction = await tx.manualTransaction.delete({ where: { id } });
+
+        if (transaction.type === 'EXPENSE')
+            await recalculateSummaries(tx, [transaction.date]);
+
+        return transaction;
+    });
+}

@@ -1,7 +1,10 @@
-//..\src\services\sale.service.js
+// backend/src/services/sale.service.js
 import prisma from "../db/prisma.js";
 import AppError from "../utils/error.util.js";
 import pkg from "@prisma/client";
+import dayjs from "dayjs";
+import { recalculateSummaries } from "./summary.service.js"; 
+
 const { Decimal } = pkg;
 
 export const getSales = async (where, { page, limit }) => {
@@ -224,6 +227,7 @@ export const crtSale = async (tx, data, next) => {
     if (saleType === "INSTALLMENT" && totalInstallments > 0) {
         let installments = [];
         const today = new Date(saleDate);
+        const now = dayjs();
 
         installments.push({
             saleId: sale.id,
@@ -248,12 +252,22 @@ export const crtSale = async (tx, data, next) => {
                     amount = totalRemainingDecimal.sub(sumOfPrev);
                 }
 
+                const dueDateObj = dayjs(today).add(i + 1, 'month');
+                const dueDate = dueDateObj.toDate();
+                
+                let status = "UPCOMING";
+                if (dueDateObj.isSame(now, 'month') && dueDateObj.isSame(now, 'year')) {
+                    status = "PENDING";
+                } else if (dueDateObj.isBefore(now, 'day')) {
+                    status = "LATE";
+                }
+
                 installments.push({
                     saleId: sale.id,
                     amount,
                     paidDate: null,
-                    dueDate: new Date(today.getFullYear(), today.getMonth() + (i + 1), today.getDate()),
-                    status: "UPCOMING",
+                    dueDate: dueDate,
+                    status: status,
                 });
             }
         }
@@ -285,6 +299,8 @@ export const crtSale = async (tx, data, next) => {
         data: { stockQuantity: { decrement: sale.quantity } },
     });
 
+    await recalculateSummaries(tx, [new Date(saleDate)]);
+
     return sale;
 };
 
@@ -293,31 +309,40 @@ export const createSale = async (data, next) =>
         await crtSale(tx, data, next)
     );
 
+export const updateSale = async (data) => {
+    return await prisma.$transaction(async (tx) => {
+        const oldSale = await tx.sale.findUnique({ where: { id: data.id } });
+        
+        const updatedSale = await tx.sale.update({
+            where: { id: data.id },
+            data,
+        });
 
-export const updateSale = async (data) =>
-    await prisma.sale.update({
-        where: { id: data.id },
-        data,
+        const datesToUpdate = [];
+        if (oldSale && oldSale.saleDate) datesToUpdate.push(oldSale.saleDate);
+        if (updatedSale.saleDate) datesToUpdate.push(updatedSale.saleDate);
+        
+        await recalculateSummaries(tx, datesToUpdate);
+
+        return updatedSale;
     });
+};
 
 export const deleteSale = async (saleId, next) => {
     return await prisma.$transaction(async (tx) => {
         const sale = await tx.sale.findUnique({
             where: { id: saleId },
-            select: {
-                id: true,
-                productId: true,
-                quantity: true,
-                status: true,
-                returnQuantity: true
-            },
+            include: {
+                installments: {
+                    select: { paidDate: true }
+                }
+            }
         });
 
         if (!sale) throw new AppError("Sale not found", 404);
 
         const productId = sale.productId;
         const quantityToRestore = sale.quantity;
-
 
         await tx.installment.deleteMany({ where: { saleId: sale.id } });
 
@@ -338,8 +363,18 @@ export const deleteSale = async (saleId, next) => {
             });
         }
 
-        return await tx.sale.delete({
+        const deletedSale = await tx.sale.delete({
             where: { id: saleId },
         });
+
+        const datesToUpdate = [sale.saleDate];
+        if (sale.installments) {
+            sale.installments.forEach(inst => {
+                if (inst.paidDate) datesToUpdate.push(inst.paidDate);
+            });
+        }
+        await recalculateSummaries(tx, datesToUpdate);
+       
+        return deletedSale;
     });
 };

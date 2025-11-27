@@ -6,7 +6,7 @@ import { createCustomerSchema } from "../schemas/customer.schema.js";
 import { createProductSchema, createProductStockSchema } from "../schemas/product.schema.js";
 import { createSaleSchema } from "../schemas/sale.schema.js";
 import zodError from "../utils/zod.error.js";
-
+import { recalculateSummaries } from "./summary.service.js";
 
 const parse = (schema, data) => {
     const parseResult = schema.safeParse(data);
@@ -19,9 +19,6 @@ const parse = (schema, data) => {
 export const handleCreateOneShotSale = async (req, res, next) => {
     try {
         const result = await prisma.$transaction(async (tx) => {
-            // =====================
-            // Step 1: Customer
-            // =====================
             const customerData = parse(createCustomerSchema, req.body.customer);
 
             let customer;
@@ -36,9 +33,6 @@ export const handleCreateOneShotSale = async (req, res, next) => {
             }
             if (!customer) throw new AppError("Failed to create or find customer", 400);
 
-            // =====================
-            // Step 2: Product
-            // =====================
             const productData = parse(createProductSchema, {
                 ...req.body.product,
                 date: req.body.sale.saleDate,
@@ -73,10 +67,17 @@ export const handleCreateOneShotSale = async (req, res, next) => {
                 if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2002") {
                     product = await tx.product.findUnique({
                         where: { name: productData.name },
-                        include: { stockTransaction: true },
                     });
 
                     if (!product) throw new AppError("Existing product not found", 404);
+
+                    const lastPurchase = await tx.stockTransaction.findFirst({
+                        where: { productId: product.id, type: "PURCHASE" },
+                        orderBy: { date: 'desc' },
+                        select: { buyingPrice: true }
+                    });
+
+                    product.buyingPrice = lastPurchase?.buyingPrice || 0;
 
                     if (product.stockQuantity < req.body.sale.quantity) {
                         const diff = req.body.sale.quantity - product.stockQuantity;
@@ -106,19 +107,12 @@ export const handleCreateOneShotSale = async (req, res, next) => {
                             data: { stockQuantity: { increment: diff } },
                         });
 
-                        product = await tx.product.findUnique({
-                            where: { id: product.id },
-                            include: { stockTransaction: true },
-                        });
-                        product.buyingPrice = stockTx.buyingPrice
+                        product.buyingPrice = stockTx.buyingPrice;
                     }
                 } else throw err;
             }
             if (!product) throw new AppError("Failed to create or find product", 400);
 
-            // =====================
-            // Step 3: Sale
-            // =====================
             const saleInput = parse(createSaleSchema, {
                 ...req.body.sale,
                 productId: product.id,
@@ -175,7 +169,7 @@ export const handleCreateOneShotSale = async (req, res, next) => {
             if (discount.gt(totalAmount))
                 throw new AppError("Discount cannot exceed total", 400);
             if (product.stockQuantity < quantity)
-                throw new AppError(`Insufficient stock: available ${product.stockQuantity}`, 400);
+                throw new AppError(`Product with name ${product.name} Already Exists.\nInsufficient stock: available ${product.stockQuantity}.\nPlease add more stock`, 400);
 
             let sale = null;
             try {
@@ -254,6 +248,8 @@ export const handleCreateOneShotSale = async (req, res, next) => {
                 where: { id: Number(product.id) },
                 data: { stockQuantity: { decrement: quantity } },
             });
+
+            await recalculateSummaries(tx, [new Date(saleDate)]);
 
             return sale;
         });
