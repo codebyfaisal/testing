@@ -85,7 +85,7 @@ const SaleNew = () => {
           ...prev,
           paidAmount: newPaid,
           firstInstallment: newPaid,
-          totalInstallments: 0,
+          totalInstallments: 1,
         };
       } else if (prev.saleType === "INSTALLMENT") {
         return {
@@ -136,7 +136,7 @@ const SaleNew = () => {
       newErrors.quantity = `Not enough stock available. Max: ${stockQuantity}`;
 
     if (formData.saleType === "INSTALLMENT") {
-      if (totalInstallments < 1 || totalInstallments > 10)
+      if (totalInstallments < 1)
         newErrors.totalInstallments = "Installments must be between 1 and 10.";
 
       if (firstInstallment > remainingAfterDiscount)
@@ -175,7 +175,7 @@ const SaleNew = () => {
       const paid = remainingAfterDiscount;
       data.paidAmount = paid;
       data.firstInstallment = paid;
-      data.totalInstallments = 0;
+      data.totalInstallments = 1;
       data.perInstallment = paid;
       data.remainingAmount = 0;
 
@@ -352,6 +352,14 @@ const SaleNew = () => {
                   disabled
                   currency={true}
                 />
+                <Input
+                  label="Remaining Balance"
+                  value={remainingAmount.toLocaleString()}
+                  disabled
+                  className="font-bold col-start-3"
+                  currency={true}
+                  inputClass="ring-2 ring-[rgb(var(--color-primary))] text-[rgb(var(--color-primary))]"
+                />
               </>
             ) : (
               <Input
@@ -363,14 +371,6 @@ const SaleNew = () => {
                 currency={true}
               />
             )}
-            <Input
-              label="Remaining Balance"
-              value={remainingAmount.toLocaleString()}
-              disabled
-              className="font-bold col-start-3"
-              currency={true}
-              inputClass="ring-2 ring-[rgb(var(--color-primary))] text-[rgb(var(--color-primary))]"
-            />
           </div>
 
           <Button

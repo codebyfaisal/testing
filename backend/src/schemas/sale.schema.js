@@ -22,8 +22,7 @@ export const createSaleSchema = z
             (data.saleType === "INSTALLMENT" && data.firstInstallment > 0) ||
             (data.saleType === "CASH" && data.paidAmount > 0),
         {
-            message:
-                "If saleType is 'INSTALLMENT', firstInstallment will be must; if 'CASH', paidAmount must be greater than 0.",
+            message: ({ input: { saleType } }) => `When SaleType is '${saleType}', ${saleType === "INSTALLMENT" ? "first Installment will be must" : "paidAmount must be greater than 0"}`,
             path: ["saleType"],
         }
     );

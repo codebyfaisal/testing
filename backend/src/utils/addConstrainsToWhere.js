@@ -4,8 +4,11 @@ function addContainsToWhere(where) {
     const updated = Array.isArray(where) ? [] : {};
 
     for (const [key, value] of Object.entries(where)) {
-        if (typeof value === 'string' || typeof value === 'number')
-            updated[key] = { contains: value };
+
+        if (typeof value === 'string' || typeof value === 'number') {
+            if (key === 'id' || key === 'customerId' || key === 'productId' || key === 'saleId') updated[key] = Number(value) || 0;
+            else updated[key] = { contains: value };
+        }
         else updated[key] = addContainsToWhere(value);
     }
 

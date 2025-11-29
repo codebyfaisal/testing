@@ -113,7 +113,7 @@ const EditModal = ({
                 onChange={handleChange}
                 required={field.required}
                 error={errors[key]}
-                disabled={loading}
+                disabled={loading || field.disabled}
                 options={field.options}
                 {...field.rest}
               />

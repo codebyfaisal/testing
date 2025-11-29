@@ -63,8 +63,6 @@ const Setting = () => {
   };
 
   const handleAction = async (action, path) => {
-    console.log(action, path);
-
     if (action === "view") {
       try {
         const response = await apiClient.get("/settings/open-folder?path=" + path);
@@ -88,27 +86,29 @@ const Setting = () => {
           <Palette className="w-5 h-5" /> <span>Appearance</span>
         </h2>
 
-        <div className="flex items-center justify-between p-3 bg-[rgb(var(--bg))] rounded-lg shadow-inner">
-          <label className="text-base font-medium">UI Theme</label>
-          <div className="flex items-center space-x-2">
-            <span className="text-sm capitalize">{theme}</span>
-            <Button
-              onClick={toggleTheme}
-              variant="secondary"
-              title={`Switch to ${theme === "light" ? "Dark" : "Light"} Mode`}
-            >
-              {theme === "light" ? <Moon size={20} /> : <Sun size={20} />}
-            </Button>
+        <div className="grid grid-cols-2 gap-2">
+          <Select label="UI Font Style"
+            name="fontChanger"
+            options={options}
+            onChange={handleFontChange}
+            value={currentFont}
+          />
+
+          <div>
+            <label className="text-right font-medium block pb-[0.2rem]">UI Theme</label>
+            <div className="flex items-center justify-end gap-4 w-full py-[0.25rem] rounded-md
+            bg-[rgb(var(--input-bg))] ring ring-[rgb(var(--border))] font-medium">
+              <span className="text-sm capitalize">{theme}</span>
+              <Button
+                onClick={toggleTheme}
+                variant="secondary"
+                title={`Switch to ${theme === "light" ? "Dark" : "Light"} Mode`}
+              >
+                {theme === "light" ? <Moon size={20} /> : <Sun size={20} />}
+              </Button>
+            </div>
           </div>
         </div>
-
-        <Select
-          label="Choose UI Font Style"
-          name="fontChanger"
-          options={options}
-          onChange={handleFontChange}
-          value={currentFont}
-        />
       </section>
 
       <section className="space-y-4">

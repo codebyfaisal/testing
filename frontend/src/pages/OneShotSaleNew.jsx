@@ -19,7 +19,6 @@ const CombinedNewForm = () => {
   const navigate = useNavigate();
   const { post, loading } = useApi();
 
-  /** -------------------- CUSTOMER -------------------- **/
   const [customer, setCustomer] = useState({
     name: "",
     cnic: "",
@@ -27,7 +26,6 @@ const CombinedNewForm = () => {
     address: "",
   });
 
-  /** -------------------- PRODUCT -------------------- **/
   const [product, setProduct] = useState({
     name: "",
     category: "uncategorized",
@@ -37,7 +35,6 @@ const CombinedNewForm = () => {
     note: "",
   });
 
-  /** -------------------- SALE -------------------- **/
   const [sale, setSale] = useState({
     agreementNo: "",
     saleDate: new Date().toISOString().split("T")[0],
@@ -46,12 +43,11 @@ const CombinedNewForm = () => {
     paidAmount: 0,
     firstInstallment: 0,
     saleType: "INSTALLMENT",
-    totalInstallments: 1,
+    totalInstallments: 10,
   });
 
   const [errors, setErrors] = useState({});
 
-  /** -------------------- HANDLERS -------------------- **/
   const handleCustomerChange = (e) => {
     const { name, value } = e.target;
     let newValue = value;
@@ -87,7 +83,6 @@ const CombinedNewForm = () => {
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
-  /** -------------------- SALE LOGIC -------------------- **/
   const { quantity, discount, firstInstallment, totalInstallments } = sale;
   const sellingPrice = Number(product.sellingPrice);
   const totalAmount = sellingPrice * Number(quantity);
@@ -106,11 +101,9 @@ const CombinedNewForm = () => {
       )
       : 0;
 
-  /** -------------------- SUBMIT -------------------- **/
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Basic front-end validation
     if (!customer.name || !product.name) {
       showError("Please fill in all required fields.");
       return;
@@ -141,7 +134,6 @@ const CombinedNewForm = () => {
     }
   };
 
-  /** -------------------- RENDER -------------------- **/
   if (loading)
     return (
       <section className="w-full h-full flex items-center justify-center">

@@ -15,15 +15,13 @@ import {
     BarChart,
     Box,
     ChevronDown,
-    ChevronUp,
     PackagePlus,
-    Plus,
 } from "lucide-react";
 import formatCurrency from "../utils/formatCurrency";
 
 const STOCK_TYPES = [
     { label: "Purchase (IN)", value: "PURCHASE" },
-    { label: "Supplier Return (OUT)", value: "SUPPLIER_RETURN" },
+    // { label: "Supplier Return (OUT)", value: "SUPPLIER_RETURN" },
 ];
 
 const DetailItem = ({ label, value, className = "", currency = false }) => (
@@ -45,6 +43,7 @@ const ADD_STOCK_FIELDS = (product) => [
         type: "select",
         required: true,
         options: STOCK_TYPES,
+        disabled: true,
     },
     {
         label: "Buying Price (Unit)",
@@ -268,7 +267,6 @@ const ProductDetail = () => {
 
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
                 <div className="bg-[rgb(var(--bg))] p-6 rounded-md shadow-md border border-[rgb(var(--border))] space-y-4 lg:col-span-1">
                     <h2 className="text-xl font-semibold mb-4 flex items-center border-b pb-2">
                         <Package className="w-5 h-5 mr-2 text-[rgb(var(--primary))]" />{" "}
@@ -402,17 +400,15 @@ const ProductDetail = () => {
                 </div>
             </div>
 
-
             <EditModal
                 isOpen={isAddStockModalOpen}
-                title="Add Stock / Record Return"
+                title="Add Stock"
                 initialData={getInitialStockData(productOverview)}
                 fields={ADD_STOCK_FIELDS(productOverview)}
                 onClose={() => setIsAddStockModalOpen(false)}
                 onSave={handleAddStockSubmit}
                 loading={stockLoading}
             />
-
         </div>
     );
 };

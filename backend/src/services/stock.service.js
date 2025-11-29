@@ -34,7 +34,6 @@ export const getStockTransactions = async (where, { page, limit }) =>
 
 export const createStock = async (data, tx) => {
     const { id: productId, stockQuantity, type, date, buyingPrice } = data;
-    console.log(data);
     let direction = type === "SUPPLIER" ? "OUT" : "IN";
 
     const product = await tx.product.findUnique({
@@ -84,6 +83,11 @@ export const createStock = async (data, tx) => {
     }
     finalNote += data.note ? ` | Note: ${data.note}` : "";
 
+    if (data?.saleId) {
+        stockData.saleId = data.saleId;
+        finalNote += ` | Sale: ${data.saleId}`;
+    }
+
     stockData.note = finalNote;
     const transaction = await tx.stockTransaction.create({ data: stockData });
 
@@ -94,7 +98,7 @@ export const createStock = async (data, tx) => {
     return transaction;
 };
 
-export const createStockTransaction = async (data) => 
+export const createStockTransaction = async (data) =>
     await prisma.$transaction((tx) => createStock(data, tx));
 
 export const deleteStockTransaction = async (id) => {

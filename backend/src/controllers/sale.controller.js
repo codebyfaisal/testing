@@ -22,6 +22,7 @@ export const handleGetSale = getOneHandler(
 )
 
 export const handleCreateSale = async (req, res, next) => {
+    console.log(req.body);
     const parseResult = createSaleSchema.safeParse(req.body);
 
     if (!parseResult.success)

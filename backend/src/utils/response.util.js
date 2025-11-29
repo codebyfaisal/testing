@@ -1,13 +1,10 @@
 import prisma from "../db/prisma.js";
 import { performDbBackup, readAppConfig } from "../os/dbBacker.os";
-import { updateAllOverdueStatus } from "../services/installment.service";
 import { generateSummary } from "../services/summary.service";
 import { getNoOfWrites, increaseNoOfWrites, resetNoOfWrites } from "../store/session.store";
 
 export const successRes = async (res, status = 200, success, message, data) => {
     res.status(status).json({ success, message, data });
-
-    updateAllOverdueStatus();
 
     try {
         const method = res.req?.method;

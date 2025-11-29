@@ -12,45 +12,46 @@ export const getSales = async (where, { page, limit }) => {
         const AND = {};
         const or = [];
 
-        const { customerId, customerName, phone, cnic, productName, saleDate } = where
+        const { regNo, customerId, customerName, phone, cnic, productName, saleDate } = where
+        if (regNo) AND.id = Number(regNo);
+        else {
+            if (customerId) AND.customerId = Number(customerId);
+            else if (customerName) {
+                or.push({
+                    customer: {
+                        name: {
+                            contains: customerName,
+                        },
+                    },
+                });
+            } else if (phone || cnic) {
+                const key = cnic ? "cnic" : "phone";
+                const value = cnic || phone;
+                or.push({
+                    customer: {
+                        [key]: {
+                            contains: value,
+                        },
+                    },
+                });
+            }
 
-        if (customerId) AND.customerId = Number(customerId);
-        else if (customerName) {
-            or.push({
-                customer: {
+            if (or.length > 0) AND.OR = or;
+            if (productName) {
+                AND.product = {
                     name: {
-                        contains: customerName,
+                        contains: productName,
                     },
-                },
-            });
-        } else if (phone || cnic) {
-            const key = cnic ? "cnic" : "phone";
-            const value = cnic || phone;
-            or.push({
-                customer: {
-                    [key]: {
-                        contains: value,
-                    },
-                },
-            });
-        }
+                };
+            }
 
-        if (or.length > 0) AND.OR
-            = or;
-        if (productName) {
-            AND.product = {
-                name: {
-                    contains: productName,
-                },
-            };
-        }
-
-        if (saleDate) {
-            if (saleDate.from || saleDate.to) {
-                AND.saleDate = {};
-                if (saleDate.from) AND.saleDate.gte = new Date(saleDate.from);
-                if (saleDate.to) AND.saleDate.lte = new Date(saleDate.to);
-            } else AND.saleDate = new Date(saleDate);
+            if (saleDate) {
+                if (saleDate.from || saleDate.to) {
+                    AND.saleDate = {};
+                    if (saleDate.from) AND.saleDate.gte = new Date(saleDate.from);
+                    if (saleDate.to) AND.saleDate.lte = new Date(saleDate.to);
+                } else AND.saleDate = new Date(saleDate);
+            }
         }
 
         const sales = await tx.sale.findMany({
@@ -64,7 +65,7 @@ export const getSales = async (where, { page, limit }) => {
             orderBy: { saleDate: "desc" },
         });
         const total = await tx.sale.count({ where: AND });
-
+        console.log(sales)
         return { sales, total };
     });
 };

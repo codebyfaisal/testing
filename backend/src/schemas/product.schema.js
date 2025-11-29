@@ -18,7 +18,7 @@ export const createProductSchema = z
         brand: z.string().optional(),
         buyingPrice: positiveNumber("Buying price"),
         sellingPrice: positiveNumber("Selling price"),
-        stockQuantity: positiveNumber("Initial stock").int({
+        stockQuantity: positiveNumber("Initial stock quantity", null, 1).int({
             message: "Initial stock must be a whole number starting from 1",
         }),
         note: noteSchema.optional(),

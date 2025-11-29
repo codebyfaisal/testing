@@ -16,16 +16,17 @@ function useQuery() {
 }
 
 const customerSearchOptions = [
-  { label: "ID", value: "customerId" },
   { label: "Name", value: "customerName" },
   { label: "Phone", value: "phone" },
   { label: "CNIC", value: "cnic" },
+  { label: "ID", value: "customerId" },
 ];
 
 const Sales = () => {
   const navigate = useNavigate();
   const query = useQuery();
 
+  const regNo = query.get("regNo") || "";
   const initialCustomerId = query.get("customerId") || "";
   const initialProductQuery = query.get("productName") || "";
   const initialCustomerFilterType =
@@ -35,6 +36,7 @@ const Sales = () => {
   const [page, setPage] = useState(1);
 
   const [filters, setFilters] = useState({
+    regNo,
     customerQuery: initialCustomerId,
     customerFilterType: initialCustomerFilterType,
     productQuery: initialProductQuery,
@@ -80,7 +82,7 @@ const Sales = () => {
     const productInput = filters.productQuery.trim();
     const customerFilterType = filters.customerFilterType;
 
-
+    if (filters.regNo) newAppliedFilters.regNo = filters.regNo;
     if (customerInput) newAppliedFilters[customerFilterType] = customerInput;
     if (productInput) newAppliedFilters.productName = productInput;
     if (filters.saleDate) newAppliedFilters.saleDate = filters.saleDate;
@@ -90,6 +92,7 @@ const Sales = () => {
 
   const handleReset = () => {
     setFilters({
+      regNo: "",
       customerQuery: "",
       customerFilterType: "customerName",
       productQuery: "",
@@ -164,8 +167,10 @@ const Sales = () => {
       {
         header: "Remaining Installments",
         accessor: "remainingInstallments",
-        render: (row) => (Number(row.totalInstallments) - Number(row.paidInstallments)).toLocaleString(),
-        className: "text-center"
+        className: "text-center",
+        render: (row) => row.saleType === "CASH" ?
+          <StatusBadge status={row.saleType} /> :
+          (Number(row.totalInstallments) - Number(row.paidInstallments)).toLocaleString(),
       },
       {
         header: "Status", accessor: "status",
@@ -194,7 +199,17 @@ const Sales = () => {
       </div>
 
       <div className="bg-[rgb(var(--bg))] p-4 rounded-lg shadow-md border border-[rgb(var(--border))]">
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4">
+        <div className="grid grid-cols-1 md:grid-cols-6 gap-4 mb-4">
+          <Input
+            label="Registration No."
+            type="number"
+            value={filters.regNo}
+            onChange={(e) =>
+              setFilters((f) => ({ ...f, regNo: e.target.value }))
+            }
+            placeholder="e.g 1"
+            className="col-span-full md:col-span-1"
+          />
           <Input
             label="Product Name"
             type="search"
@@ -236,7 +251,7 @@ const Sales = () => {
           </div>
 
           <Input
-            label="Sale Date (Disabled)"
+            label="Sale Date"
             type="date"
             value={filters.saleDate}
             onChange={(e) =>
@@ -244,7 +259,7 @@ const Sales = () => {
             }
             className="col-span-full md:col-span-2"
           />
-          <div className="flex justify-end items-end gap-4 col-span-full md:col-span-3">
+          <div className="flex justify-end items-end gap-4 col-span-full md:col-span-4">
             <Button
               variant="secondary"
               onClick={handleReset}
