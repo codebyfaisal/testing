@@ -41,6 +41,7 @@ enum SaleStatus {
 }
 
 enum InstallmentStatus {
+  PENDING
   PAID
   LATE
   PAID_LATE
