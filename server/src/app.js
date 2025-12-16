@@ -5,20 +5,22 @@ import allowOrigins from "./utils/allowOrigins.js";
 
 const app = express();
 
-app.use(cors(
-    {
-        origin: allowOrigins(),
-        credentials: true
-    }
-));
+// app.use(cors(
+//     {
+//         origin: allowOrigins(),
+//         credentials: true
+//     }
+// ));
+
+app.use(cors());
 
 app.use(express.json({ limit: "16kb" }));
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 app.use(express.static("public"));
 app.use(cookieParser());
 
-app.use("/api/v1/", (req, res) => {
-    res.json({ message: "Welcome to the API" });
+app.use("/api/v1/test", (req, res) => {
+    return res.json({ message: "Welcome to the API: " + req.originalUrl });
 });
 
 // routes import
