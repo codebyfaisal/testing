@@ -1,0 +1,15 @@
+import { Router } from "express";
+import {
+    createTestimonial,
+    deleteTestimonial,
+    getAllTestimonials,
+    getTestimonialById,
+    updateTestimonial
+} from "../controllers/testimonial.controller.js";
+
+const router = Router();
+
+router.route("/").get(getAllTestimonials).post(createTestimonial);
+router.route("/:id").get(getTestimonialById).patch(updateTestimonial).delete(deleteTestimonial);
+
+export default router;
