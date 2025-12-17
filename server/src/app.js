@@ -17,10 +17,14 @@ app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 app.use(express.static("public"));
 app.use(cookieParser());
 
-app.get("/api/v1/test", (req, res) => {
-    console.log(req.originalUrl);
+app.use((req, res, next) => {
     console.log(req.cookies);
-    return res.json({ message: "Welcome to the API: " + req.originalUrl });
+    console.log(req.originalUrl);
+    next();
+})
+
+app.get("/api/v1/test", (req, res) => {
+    return res.json({ message: "Welcome to the API: " + req.originalUrl, cookies: req.cookies });
 });
 
 // routes import
