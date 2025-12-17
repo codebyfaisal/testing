@@ -1,4 +1,4 @@
-import { IS_PRODUCTION, CORS_ALLOWED_ORIGINS, CLIENT_ALLOWED_ORIGINS, ADMIN_ALLOWED_ORIGINS, NODE_ENV } from "../constants.js";
+import { CORS_ALLOWED_ORIGINS, CLIENT_ALLOWED_ORIGINS, ADMIN_ALLOWED_ORIGINS, NODE_ENV } from "../constants.js";
 
 const allowOrigins = () => {
     let origins = [];
