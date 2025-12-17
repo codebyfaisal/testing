@@ -3,7 +3,7 @@ import { PageHeader, SEO, Button, SocialIcon } from "../components";
 import { cn } from "../utils/cn";
 import { motion } from "motion/react";
 import usePortfolioStore from "../store/usePortfolioStore";
-import { sendMessage } from "../services/api";
+import portfolioService from "../api/portfolio.service";
 import toast from "react-hot-toast";
 import {
   FaEnvelope,
@@ -48,7 +48,7 @@ const Contact = () => {
 
     setIsSubmitting(true);
     try {
-      await sendMessage({
+      await portfolioService.sendMessage({
         from: formData.name,
         email: formData.email,
         subject: formData.type || "General Inquiry",

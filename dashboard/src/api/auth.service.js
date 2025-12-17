@@ -3,6 +3,7 @@ import api from "./axios";
 const authService = {
     login: async (credentials) => {
         const response = await api.post("/users/login", credentials);
+        console.log(response);
         return response.data.data;
     },
     logout: async () => {
@@ -10,8 +11,13 @@ const authService = {
         return response.data.data;
     },
     getUser: async () => {
-        const response = await api.get("/users/me");
-        return response.data.data;
+        try {
+            const response = await api.get("/users/me");
+            return response.data.data;
+        } catch (error) {
+            console.log(error);
+            throw error;
+        }
     },
     updateUser: async (data) => {
         const response = await api.patch("/users/me", data);

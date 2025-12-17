@@ -28,9 +28,9 @@ import { Toaster } from "react-hot-toast";
 
 const AuthGuard = ({ children }) => {
   const { user, hasAdmin } = useDashboardStore();
-  if (!user) {
-    return <Navigate to={hasAdmin ? "/login" : "/register"} replace />;
-  }
+
+  if (!user) return <Navigate to={hasAdmin ? "/login" : "/register"} replace />;
+
   return children;
 };
 
@@ -45,7 +45,7 @@ const PublicGuard = ({ children, requireAdminCheck = false }) => {
 };
 
 function App() {
-  const { checkAdminStatus, getUser } = useDashboardStore();
+  const { checkAdminStatus, getUser, user } = useDashboardStore();
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
@@ -57,6 +57,10 @@ function App() {
 
     init();
   }, []);
+
+  useEffect(() => {
+    console.log(user);
+  }, [user]);
 
   const router = useMemo(() => {
     return createBrowserRouter(

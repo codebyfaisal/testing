@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { fetchPortfolioData } from '../services/api';
+import portfolioService from '../api/portfolio.service';
 
 const usePortfolioStore = create((set) => ({
     data: null,
@@ -13,7 +13,7 @@ const usePortfolioStore = create((set) => ({
     fetchData: async () => {
         set({ loading: true, error: null });
         try {
-            const data = await fetchPortfolioData();
+            const data = await portfolioService.getPortfolioData();
             set({
                 data,
                 loading: false,
