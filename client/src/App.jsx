@@ -19,7 +19,7 @@ import {
 } from "./pages";
 import usePortfolioStore from "./store/usePortfolioStore";
 import { Toaster } from "react-hot-toast";
-import { API_URL as BASE_API_URL } from "./services/api";
+import { BASE_API_URL } from "./api/axios";
 
 function App() {
   const { fetchData, config } = usePortfolioStore();

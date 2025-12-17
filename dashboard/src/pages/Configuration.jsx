@@ -1,12 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
 import useDashboardStore from "../store/useDashboardStore";
-import {
-  FaSave,
-  FaImage,
-  FaPalette,
-  FaStar,
-  FaProjectDiagram,
-} from "react-icons/fa";
+import { FaSave, FaImage, FaPalette, FaStar } from "react-icons/fa";
 import { useBlocker } from "react-router-dom";
 import {
   Button,
@@ -17,10 +11,10 @@ import {
   Select,
 } from "../components";
 import ImagePicker from "../components/ImagePicker";
-import SettingsMessageTypes from "../components/settings/SettingsMessageTypes";
+import ConfigMessageTypes from "../components/config/ConfigMessageTypes";
 import toast from "react-hot-toast";
 
-const Settings = () => {
+const Configuration = () => {
   const { data, getConfig, updateConfig, fetchServices } = useDashboardStore();
   const [config, setConfig] = useState({
     appearance: {
@@ -168,14 +162,14 @@ const Settings = () => {
       };
 
       await updateConfig(payload);
-      toast.success("Settings updated successfully!");
+      toast.success("Configuration updated successfully!");
       setInitialData(config);
       setIsConfirmOpen(false);
 
       if (blocker.state === "blocked") blocker.proceed();
     } catch (error) {
       console.error(error);
-      toast.error("Failed to update settings");
+      toast.error("Failed to update configuration");
       setSaveError(true);
     } finally {
       setIsSaving(false);
@@ -195,7 +189,7 @@ const Settings = () => {
   return (
     <div className="space-y-8 pb-20">
       <header>
-        <h1 className="text-3xl font-bold text-white mb-2">Settings</h1>
+        <h1 className="text-3xl font-bold text-white mb-2">Configuration</h1>
         <p className="text-zinc-400">
           Customize the appearance and content of your portfolio.
         </p>
@@ -420,7 +414,7 @@ const Settings = () => {
         </div>
 
         {/* Message Types */}
-        <SettingsMessageTypes
+        <ConfigMessageTypes
           messageTypes={config.messageTypes}
           onChange={handleMessageTypesChange}
         />
@@ -470,4 +464,4 @@ const Settings = () => {
   );
 };
 
-export default Settings;
+export default Configuration;

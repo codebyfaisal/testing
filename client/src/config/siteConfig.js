@@ -167,12 +167,12 @@ export const siteConfig = {
                     topic: "Topic",
                     message: "Message",
                 },
-                placeholders: {
-                    name: "Your Name",
-                    email: "your@email.com",
-                    topic: "Select a topic...",
-                    message: "Tell me about your project...",
-                },
+                    placeholders: {
+                        name: "Your Name",
+                        email: "your@email.com",
+                        topic: "Select a topic...",
+                        message: "Tell me about your project...",
+                    },
                 submitBtn: {
                     idle: "Send Message",
                     sending: "Sending...",

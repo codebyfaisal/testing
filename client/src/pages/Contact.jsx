@@ -15,6 +15,13 @@ import {
 import { Skeleton } from "../components/Skeleton";
 import { siteConfig } from "../config/siteConfig";
 
+const initialState = {
+  name: "",
+  email: "",
+  type: "General",
+  message: "",
+};
+
 const Contact = () => {
   const {
     seo,
@@ -26,12 +33,7 @@ const Contact = () => {
   const { config, user, isRounded, loading } = usePortfolioStore();
   const messageTypes = config?.messageTypes || ["General", "Job", "Other"];
 
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    type: "",
-    message: "",
-  });
+  const [formData, setFormData] = useState(initialState);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -56,7 +58,7 @@ const Contact = () => {
         type: formData.type,
       });
       toast.success("Message sent successfully!");
-      setFormData({ name: "", email: "", type: "", message: "" });
+      setFormData(initialState);
     } catch (error) {
       console.error("Failed to send message:", error);
       toast.error(
@@ -263,13 +265,13 @@ const Contact = () => {
                     <option value="" className="bg-black text-secondary">
                       {formConfig?.placeholders.topic}
                     </option>
-                    {messageTypes.map((type, index) => (
+                    {messageTypes.map((item, index) => (
                       <option
                         key={index}
-                        value={type.type}
+                        value={typeof item === "string" ? item : item.type}
                         className="bg-black"
                       >
-                        {type.type}
+                        {typeof item === "string" ? item : item.type}
                       </option>
                     ))}
                   </select>
@@ -281,7 +283,7 @@ const Contact = () => {
                   htmlFor="message"
                   className="block text-sm font-medium text-text-secondary mb-2"
                 >
-                  {formConfig?.labels?.message}{" "}
+                  {formConfig?.labels?.message}
                   <span className="text-red-500">*</span>
                 </label>
                 <textarea

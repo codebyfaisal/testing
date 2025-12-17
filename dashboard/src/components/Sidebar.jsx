@@ -29,7 +29,7 @@ const Sidebar = ({ isOpen, onClose }) => {
     { path: "/testimonials", icon: FaCommentDots, label: "Testimonials" },
     { path: "/messages", icon: FaEnvelope, label: "Messages" },
     { path: "/files", icon: FaFolder, label: "File Manager" },
-    { path: "/settings", icon: FaCog, label: "Settings" },
+    { path: "/configuration", icon: FaCog, label: "Configuration" },
   ];
 
   return (

@@ -15,7 +15,7 @@ import {
   Services,
   Projects,
   Testimonials,
-  Settings,
+  Configuration,
   Messages,
   Login,
   Register,
@@ -161,10 +161,10 @@ function App() {
               }
             />
             <Route
-              path="settings"
+              path="configuration"
               element={
                 <ErrorBoundary>
-                  <Settings />
+                  <Configuration />
                 </ErrorBoundary>
               }
             />

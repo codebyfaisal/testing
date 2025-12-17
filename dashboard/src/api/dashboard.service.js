@@ -133,23 +133,23 @@ const dashboardService = {
 
 
     // Media / File Manager
-    getMedia: async (resourceType = "image", nextCursor = null) => {
-        const response = await api.get("/media", {
+    getFiles: async (resourceType = "image", nextCursor = null) => {
+        const response = await api.get("/files", {
             params: { resourceType, nextCursor }
         });
         return response.data.data;
     },
-    uploadMedia: async (file) => {
+    uploadFile: async (file) => {
         const formData = new FormData();
         formData.append("file", file);
-        const response = await api.post("/media", formData, {
+        const response = await api.post("/files", formData, {
             headers: { "Content-Type": "multipart/form-data" },
         });
         return response.data.data;
     },
-    deleteMedia: async (publicId) => {
+    deleteFile: async (publicId) => {
         const encodedId = encodeURIComponent(publicId);
-        const response = await api.delete(`/media/${encodedId}`);
+        const response = await api.delete(`/files/${encodedId}`);
         return response.data.data;
     },
 };

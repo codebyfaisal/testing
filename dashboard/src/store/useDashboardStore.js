@@ -471,14 +471,14 @@ const useDashboardStore = create((set, get) => ({
         }
     },
 
-    // Media Actions
-    fetchMedia: async (resourceType = "image", nextCursor = null) => {
+    // Media / File Manager Actions
+    fetchFiles: async (resourceType = "image", nextCursor = null) => {
         // If simply fetching next page, we don't check cache in the same way, 
         // but for simplicity let's just always fetch for now or implement smarter caching.
         // For now, let's just allow refetching to ensure fresh data for file manager.
         set({ isLoading: true });
         try {
-            const data = await dashboardService.getMedia(resourceType, nextCursor);
+            const data = await dashboardService.getFiles(resourceType, nextCursor);
             // Note: data contains { resources, next_cursor }
             set({ isLoading: false });
             return data;
@@ -487,10 +487,10 @@ const useDashboardStore = create((set, get) => ({
             throw error;
         }
     },
-    uploadMedia: async (file) => {
+    uploadFile: async (file) => {
         set({ isLoading: true });
         try {
-            const newMedia = await dashboardService.uploadMedia(file);
+            const newMedia = await dashboardService.uploadFile(file);
             // We might want to refresh the media list or just return success
             // For now, let's return it so the UI can update
             set({ isLoading: false });
@@ -501,11 +501,12 @@ const useDashboardStore = create((set, get) => ({
             throw new Error(message);
         }
     },
-    deleteMedia: async (publicId) => {
+    deleteFile: async (publicId) => {
         set({ isLoading: true });
         try {
-            await dashboardService.deleteMedia(publicId);
+            const result = await dashboardService.deleteFile(publicId);
             set({ isLoading: false });
+            return result;
         } catch (error) {
             const message = getErrorMessage(error);
             set({ error: message, isLoading: false });

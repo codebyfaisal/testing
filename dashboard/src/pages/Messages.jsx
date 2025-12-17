@@ -1,4 +1,4 @@
-import React, { useState, use, Suspense } from "react";
+import React, { useState, use, Suspense, useEffect } from "react";
 import useDashboardStore from "../store/useDashboardStore";
 import { motion } from "motion/react";
 import { FaEnvelope, FaEnvelopeOpen, FaTrash, FaEye } from "react-icons/fa";
@@ -12,8 +12,13 @@ import {
 import toast from "react-hot-toast";
 
 const MessageList = ({ onView, onDelete, onMarkRead }) => {
-  const { fetchMessages } = useDashboardStore();
+  const { fetchMessages, data, getConfig } = useDashboardStore();
   const messages = use(fetchMessages());
+  const config = data?.config;
+
+  useEffect(() => {
+    if (!config?.messageTypes) getConfig();
+  }, []);
 
   if (!messages || messages.length === 0) {
     return (
@@ -58,8 +63,16 @@ const MessageList = ({ onView, onDelete, onMarkRead }) => {
                   </span>
                 </td>
                 <td className="px-6 py-4">
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-zinc-800 text-zinc-300 border border-zinc-700">
-                    {message.type || "General"}
+                  <span
+                    className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-zinc-800 text-zinc-300 border border-zinc-700"
+                    style={{
+                      backgroundColor:
+                        config?.messageTypes?.find(
+                          (t) => t.type === message.type
+                        )?.typeColor || "#27272a",
+                    }}
+                  >
+                    {message?.type || "General"}
                   </span>
                 </td>
                 <td className="px-6 py-4 font-medium text-white">

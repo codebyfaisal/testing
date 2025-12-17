@@ -1,8 +1,10 @@
 import axios from "axios";
 
+export const BASE_API_URL = "http://localhost:4000/api/v1";
+// export const BASE_API_URL = "https://testing-psi-pied.vercel.app/api/v1"
+
 const api = axios.create({
-    baseURL: "http://localhost:4000/api/v1",
-    // baseURL: "https://testing-psi-pied.vercel.app/api/v1",
+    baseURL: BASE_API_URL,
 });
 
 api.interceptors.request.use(

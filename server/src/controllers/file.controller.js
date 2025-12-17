@@ -3,7 +3,7 @@ import { deleteFromCloudinary, getCloudinaryResources, uploadOnCloudinary } from
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { ApiError } from "../utils/ApiError.js";
 
-const getMedia = asyncHandler(async (req, res) => {
+const getFiles = asyncHandler(async (req, res) => {
     const { resourceType = "image", nextCursor } = req.query;
 
     const data = await getCloudinaryResources(resourceType, nextCursor);
@@ -13,7 +13,7 @@ const getMedia = asyncHandler(async (req, res) => {
     );
 });
 
-const deleteMedia = asyncHandler(async (req, res) => {
+const deleteFile = asyncHandler(async (req, res) => {
     const { publicId } = req.params;
 
     if (!publicId) throw new ApiError(400, "Public ID is required");
@@ -27,7 +27,7 @@ const deleteMedia = asyncHandler(async (req, res) => {
     );
 });
 
-const uploadMedia = asyncHandler(async (req, res) => {
+const uploadFile = asyncHandler(async (req, res) => {
     if (!req.file) throw new ApiError(400, "File is required");
 
     const result = await uploadOnCloudinary(req.file.buffer);
@@ -40,4 +40,4 @@ const uploadMedia = asyncHandler(async (req, res) => {
 });
 
 
-export { getMedia, deleteMedia, uploadMedia };
+export { getFiles, deleteFile, uploadFile };

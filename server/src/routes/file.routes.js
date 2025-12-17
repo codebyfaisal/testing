@@ -1,16 +1,17 @@
 import { Router } from "express";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 import { upload } from "../middlewares/multer.middleware.js";
-import { getMedia, deleteMedia, uploadMedia } from "../controllers/media.controller.js";
+import { deleteFile, getFiles, uploadFile } from "../controllers/file.controller.js";
 
 const router = Router();
 
 router.use(verifyJWT);
 
 router.route("/")
-    .get(getMedia)
-    .post(upload.single("file"), uploadMedia);
+    .get(getFiles)
+    .post(upload.single("file"), uploadFile);
 
-router.route("/:publicId").delete(deleteMedia);
+router.route("/:publicId")
+    .delete(deleteFile);
 
 export default router;

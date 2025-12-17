@@ -2,19 +2,19 @@ import mongoose, { Schema } from "mongoose";
 
 const configSchema = new Schema({
     hero: {
-        greeting: { type: String, required: true, trim: true },
-        title: { type: String, required: true, trim: true },
-        subTitle: { type: String, required: true, trim: true },
-        image: { type: String, required: true, trim: true },
+        greeting: { type: String, trim: true },
+        title: { type: String, trim: true },
+        subTitle: { type: String, trim: true },
+        image: { type: String, trim: true },
     },
     about: {
-        title: { type: String, required: true, trim: true },
-        description: { type: String, required: true, trim: true },
-        image: { type: String, required: true, trim: true },
+        title: { type: String, trim: true },
+        description: { type: String, trim: true },
+        image: { type: String, trim: true },
     },
     messageTypes: [{
         type: { type: String, trim: true },
-        color: { type: String, trim: true },
+        typeColor: { type: String, trim: true, default: "#ffffff" },
     }],
     appearance: {
         theme: {
@@ -22,7 +22,7 @@ const configSchema = new Schema({
             colors: {
                 secondary: { type: String, trim: true },
             },
-            borderRadius: { type: Boolean, required: true, trim: true },
+            borderRadius: { type: Boolean, trim: true },
         },
     },
     featuredService: {

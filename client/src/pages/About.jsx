@@ -144,8 +144,11 @@ const About = () => {
             <h2 className="text-4xl md:text-5xl font-bold text-white tracking-tight">
               {config.about?.title || (
                 <>
-                  Hello, I'm{" "}
-                  <span className="text-secondary">{user?.name?.first}</span>
+                  Hello, I'm
+                  <br />
+                  <span className="text-secondary">
+                    {user?.name?.first + " " + user?.name?.last}
+                  </span>
                 </>
               )}
             </h2>

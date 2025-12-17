@@ -1,27 +1,39 @@
 import React, { useState } from "react";
-import { motion } from "motion/react";
 import { FaEnvelope, FaPlus, FaTrash } from "react-icons/fa";
-import { Input, Button, Select } from "../../components";
+import { Input, Button } from "../";
 
-const SettingsMessageTypes = ({ messageTypes = [], onChange }) => {
+const ConfigMessageTypes = ({ messageTypes = [], onChange }) => {
   const [newMessageType, setNewMessageType] = useState({
     type: "",
-    color: "bg-zinc-800",
-    required: false,
+    typeColor: "#ffffff",
   });
 
   const handleAddMessageType = (e) => {
     e.preventDefault();
-    if (newMessageType.type.trim()) {
-      const updatedTypes = [
-        ...messageTypes,
-        {
-          type: newMessageType.type.trim().toLowerCase(),
-          color: newMessageType.color,
-        },
-      ];
+    const typeName = newMessageType.type.trim();
+    if (typeName) {
+      const existingIndex = messageTypes.findIndex(
+        (t) => t.type.toLowerCase() === typeName.toLowerCase()
+      );
+
+      let updatedTypes;
+      if (existingIndex !== -1) {
+        updatedTypes = [...messageTypes];
+        updatedTypes[existingIndex] = {
+          ...updatedTypes[existingIndex],
+          typeColor: newMessageType.typeColor,
+        };
+      } else {
+        updatedTypes = [
+          ...messageTypes,
+          {
+            type: typeName,
+            typeColor: newMessageType.typeColor,
+          },
+        ];
+      }
       onChange(updatedTypes);
-      setNewMessageType({ type: "", color: "bg-zinc-800" });
+      setNewMessageType({ type: "", typeColor: "#ffffff" });
     }
   };
 
@@ -49,22 +61,16 @@ const SettingsMessageTypes = ({ messageTypes = [], onChange }) => {
           placeholder="e.g. Project Inquiry"
           className="col-span-full"
         />
-        <Select
-          value={newMessageType.color}
+        <Input
+          label="Color"
+          type="color"
+          value={newMessageType.typeColor || "#ffffff"}
           onChange={(e) =>
             setNewMessageType({
               ...newMessageType,
-              color: e.target.value,
+              typeColor: e.target.value,
             })
           }
-          label="Color"
-          options={[
-            { value: "bg-zinc-800", label: "Default (Gray)" },
-            { value: "bg-indigo-500", label: "Indigo" },
-            { value: "bg-emerald-500", label: "Emerald" },
-            { value: "bg-rose-500", label: "Rose" },
-            { value: "bg-amber-500", label: "Amber" },
-          ]}
           className="col-span-3"
         />
         <div className="flex items-end pb-0.5 col-span-1">
@@ -80,14 +86,13 @@ const SettingsMessageTypes = ({ messageTypes = [], onChange }) => {
       </div>
 
       <div className="flex flex-wrap gap-2 mt-4">
-        {messageTypes.map((type, index) => (
+        {messageTypes.map((t, index) => (
           <div
             key={index}
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm text-white ${
-              type.color || "bg-zinc-800"
-            } border border-zinc-700`}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-full text-sm text-white border border-zinc-700"
+            style={{ backgroundColor: t.typeColor || "#27272a" }}
           >
-            <span>{type.type}</span>
+            <span>{t.type}</span>
             <button
               type="button"
               onClick={() => handleRemoveMessageType(index)}
@@ -107,4 +112,4 @@ const SettingsMessageTypes = ({ messageTypes = [], onChange }) => {
   );
 };
 
-export default SettingsMessageTypes;
+export default ConfigMessageTypes;

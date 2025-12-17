@@ -35,7 +35,7 @@ const UploadBtn = ({ loading, uploading, handleFileUpload, loadMedia }) => {
 
 const FileManager = ({ isModal = false, resType = "all", onSelect }) => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const { fetchMedia, deleteMedia, uploadMedia } = useDashboardStore();
+  const { fetchFiles, deleteFile, uploadFile } = useDashboardStore();
   const [files, setFiles] = useState([]);
   const [resourceType, setResourceType] = useState(
     searchParams.get("resourceType") || resType
@@ -53,7 +53,7 @@ const FileManager = ({ isModal = false, resType = "all", onSelect }) => {
     }
     setLoading(true);
     try {
-      const data = await fetchMedia(resourceType, cursor);
+      const data = await fetchFiles(resourceType, cursor);
       if (reset) setFiles(data.resources);
       else setFiles((prev) => [...prev, ...data.resources]);
       setNextCursor(data.next_cursor);
@@ -79,7 +79,7 @@ const FileManager = ({ isModal = false, resType = "all", onSelect }) => {
       return;
 
     try {
-      await deleteMedia(publicId);
+      await deleteFile(publicId);
       setFiles((prev) => prev.filter((f) => f.public_id !== publicId));
       toast.success("File deleted successfully");
     } catch (error) {
@@ -94,7 +94,7 @@ const FileManager = ({ isModal = false, resType = "all", onSelect }) => {
 
     setUploading(true);
     try {
-      const newMedia = await uploadMedia(file);
+      const newMedia = await uploadFile(file);
       toast.success("File uploaded successfully");
       loadMedia(true);
     } catch (error) {
