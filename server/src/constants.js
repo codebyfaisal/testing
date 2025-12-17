@@ -5,6 +5,7 @@ export const DB_NAME = process.env.DB_NAME || "portfolio";
 
 export const PORT = process.env.PORT || 4000;
 export const NODE_ENV = process.env.NODE_ENV || "development";
+export const IS_PRODUCTION = process.env.NODE_ENV === "production" || process.env.VERCEL === "1";
 
 export const MONGODB_URI = process.env.MONGODB_URI;
 

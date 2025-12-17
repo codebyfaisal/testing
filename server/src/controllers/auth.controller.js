@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
-import { ACCESS_TOKEN_SECRET, ACCESS_TOKEN_EXPIRY, REFRESH_TOKEN_SECRET, REFRESH_TOKEN_EXPIRY, NODE_ENV } from "../constants.js";
+import { ACCESS_TOKEN_SECRET, ACCESS_TOKEN_EXPIRY, REFRESH_TOKEN_SECRET, REFRESH_TOKEN_EXPIRY, IS_PRODUCTION } from "../constants.js";
 
 const generateAccessAndRefereshTokens = async (userId) => {
     try {
@@ -82,7 +82,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
 const loginUser = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
-    
+
     if (!email) throw new ApiError(400, "email is required");
     if (!password) throw new ApiError(400, "password is required");
 
@@ -102,8 +102,8 @@ const loginUser = asyncHandler(async (req, res) => {
 
     const options = {
         httpOnly: true,
-        secure: NODE_ENV === "production",
-        sameSite: NODE_ENV === "production" ? "none" : "lax"
+        secure: IS_PRODUCTION,
+        sameSite: IS_PRODUCTION ? "none" : "lax"
     };
 
     return res
@@ -138,7 +138,8 @@ const logoutUser = asyncHandler(async (req, res) => {
 
     const options = {
         httpOnly: true,
-        secure: NODE_ENV === "production"
+        secure: IS_PRODUCTION,
+        sameSite: IS_PRODUCTION ? "none" : "lax"
     }
 
     return res

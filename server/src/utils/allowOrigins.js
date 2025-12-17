@@ -1,10 +1,10 @@
-import { NODE_ENV, CORS_ALLOWED_ORIGINS, CLIENT_ALLOWED_ORIGINS, ADMIN_ALLOWED_ORIGINS } from "../constants.js";
+import { IS_PRODUCTION, CORS_ALLOWED_ORIGINS, CLIENT_ALLOWED_ORIGINS, ADMIN_ALLOWED_ORIGINS } from "../constants.js";
 
 const allowOrigins = () => {
     let origins = [];
-    if (NODE_ENV === "development")
+    if (!IS_PRODUCTION)
         origins = CORS_ALLOWED_ORIGINS.split(",");
-    else if (NODE_ENV === "production")
+    else
         origins = [...CLIENT_ALLOWED_ORIGINS.split(","), ...ADMIN_ALLOWED_ORIGINS.split(",")];
 
     return origins;
