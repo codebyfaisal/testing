@@ -26,7 +26,10 @@ app.use((req, res, next) => {
 });
 
 app.get("/api/v1/test", (req, res) => {
-    return res.json({ message: "Welcome to the API: " + req.originalUrl });
+    return res.json({
+        message: "Welcome to the API: " + req.originalUrl,
+        origins: allowOrigins()
+    });
 });
 
 // routes import

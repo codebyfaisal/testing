@@ -17,7 +17,7 @@ import {
 import useDashboardStore from "@/store/useDashboardStore";
 import { toast } from "react-hot-toast";
 import { Button, Input, FilePickerModal } from "@/components";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/cn";
 
 const MenuBar = ({ editor }) => {
   if (!editor) return null;

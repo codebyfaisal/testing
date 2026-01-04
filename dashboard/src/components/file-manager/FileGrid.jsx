@@ -1,6 +1,6 @@
 import React from "react";
 import { FileItem, FileSkeleton } from "@/components";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/cn";
 
 const FileGrid = ({
   files,
