@@ -7,11 +7,7 @@ const dashboardService = {
         return response.data.data;
     },
     updateUser: async (data) => {
-        const response = await api.patch("/users/me", data);
-        return response.data.data;
-    },
-    getConfig: async () => {
-        const response = await api.get("/users/me/config");
+        const response = await api.put("/users/me", data);
         return response.data.data;
     },
     getConfig: async () => {
@@ -55,7 +51,7 @@ const dashboardService = {
         return response.data.data;
     },
     updateService: async (id, data) => {
-        const response = await api.patch(`/services/${id}`, data);
+        const response = await api.put(`/services/${id}`, data);
         return response.data.data;
     },
     deleteService: async (id) => {
@@ -73,7 +69,7 @@ const dashboardService = {
         return response.data.data;
     },
     updatePlan: async (id, data) => {
-        const response = await api.patch(`/services/plans/${id}`, data);
+        const response = await api.put(`/services/plans/${id}`, data);
         return response.data.data;
     },
     deletePlan: async (id) => {
@@ -91,7 +87,7 @@ const dashboardService = {
         return response.data.data;
     },
     updateProject: async (id, data) => {
-        const response = await api.patch(`/projects/${id}`, data);
+        const response = await api.put(`/projects/${id}`, data);
         return response.data.data;
     },
     deleteProject: async (id) => {
@@ -109,7 +105,7 @@ const dashboardService = {
         return response.data.data;
     },
     updateTestimonial: async (id, data) => {
-        const response = await api.patch(`/testimonials/${id}`, data);
+        const response = await api.put(`/testimonials/${id}`, data);
         return response.data.data;
     },
     deleteTestimonial: async (id) => {
@@ -123,11 +119,33 @@ const dashboardService = {
         return response.data.data;
     },
     markMessageRead: async (id) => {
-        const response = await api.patch(`/messages/${id}/read`);
+        const response = await api.put(`/messages/${id}/read`);
         return response.data.data;
     },
     deleteMessage: async (id) => {
         const response = await api.delete(`/messages/${id}`);
+        return response.data.data;
+    },
+
+    // Blog Posts
+    getPosts: async (params) => {
+        const response = await api.get("/posts", { params });
+        return response.data.data;
+    },
+    getPostBySlug: async (slug) => {
+        const response = await api.get(`/posts/public/${slug}`);
+        return response.data.data;
+    },
+    createPost: async (data) => {
+        const response = await api.post("/posts", data);
+        return response.data.data;
+    },
+    updatePost: async (id, data) => {
+        const response = await api.put(`/posts/${id}`, data);
+        return response.data.data;
+    },
+    deletePost: async (id) => {
+        const response = await api.delete(`/posts/${id}`);
         return response.data.data;
     },
 
@@ -150,6 +168,38 @@ const dashboardService = {
     deleteFile: async (publicId) => {
         const encodedId = encodeURIComponent(publicId);
         const response = await api.delete(`/files/${encodedId}`);
+        return response.data.data;
+    },
+
+    // Jobs
+    getJobs: async (params) => {
+        const response = await api.get("/jobs", { params });
+        return response.data.data;
+    },
+    createJob: async (data) => {
+        const response = await api.post("/jobs", data);
+        return response.data.data;
+    },
+    updateJob: async (id, data) => {
+        const response = await api.put(`/jobs/${id}`, data);
+        return response.data.data;
+    },
+    deleteJob: async (id) => {
+        const response = await api.delete(`/jobs/${id}`);
+        return response.data.data;
+    },
+
+    // Job Applications
+    getApplications: async (params) => {
+        const response = await api.get("/applications", { params });
+        return response.data.data;
+    },
+    updateApplication: async (id, data) => {
+        const response = await api.put(`/applications/${id}`, data);
+        return response.data.data;
+    },
+    deleteApplication: async (id) => {
+        const response = await api.delete(`/applications/${id}`);
         return response.data.data;
     },
 };

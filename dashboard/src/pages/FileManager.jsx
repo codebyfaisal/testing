@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import useDashboardStore from "../store/useDashboardStore";
+import useDashboardStore from "@/store/useDashboardStore";
 import { FaCloudUploadAlt, FaSync } from "react-icons/fa";
-import { Button, Modal } from "../components";
-import FileGrid from "../components/file-manager/FileGrid";
+import { Button, Modal, FileGrid, PageHeader } from "@/components";
 import toast from "react-hot-toast";
 import { useSearchParams } from "react-router-dom";
+import { cn } from "@/utils/cn";
 
 const UploadBtn = ({ loading, uploading, handleFileUpload, loadMedia }) => {
   return (
@@ -111,34 +111,42 @@ const FileManager = ({ isModal = false, resType = "all", onSelect }) => {
   };
 
   return (
-    <div className={`pb-20 ${isModal ? "space-y-4" : "space-y-6"}`}>
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div
+      className={cn(
+        isModal ? "space-y-4" : "h-[calc(100vh-2rem)] flex flex-col space-y-4"
+      )}
+    >
+      <header className={cn(isModal && "mb-0")}>
         <div className={isModal ? "hidden" : ""}>
-          <h1 className="text-3xl font-bold text-white mb-2">File Manager</h1>
-          <p className="text-zinc-400">
-            Manage your cloud assets (images, videos, PDFs).
-          </p>
+          <PageHeader
+            title="File Manager"
+            description="Manage your cloud assets (images, videos, PDFs)."
+          >
+            {!isModal && (
+              <UploadBtn
+                loading={loading}
+                uploading={uploading}
+                handleFileUpload={handleFileUpload}
+                loadMedia={loadMedia}
+              />
+            )}
+          </PageHeader>
         </div>
-        {!isModal && (
-          <UploadBtn
-            loading={loading}
-            uploading={uploading}
-            handleFileUpload={handleFileUpload}
-            loadMedia={loadMedia}
-          />
-        )}
       </header>
 
       {/* Filters */}
       <div className="flex items-center justify-between">
-        <div className="flex gap-2 border-b border-zinc-800 pb-4 overflow-x-auto">
-          {["all", "images", "videos", "PDF", "others"].map((type) =>
-            isModal && type === "others" ? (
-              <></>
-            ) : (
+        <div
+          className={cn(
+            "flex gap-2 overflow-x-auto",
+            !isModal && "border-b border-border pb-2"
+          )}
+        >
+          {["all", "images", "videos", "PDF", "others"].map((type, index) =>
+            isModal && type === "others" ? null : (
               <button
                 type="button"
-                key={type}
+                key={index}
                 onClick={() => {
                   if (!isModal) {
                     searchParams.set("resourceType", type);
@@ -149,8 +157,8 @@ const FileManager = ({ isModal = false, resType = "all", onSelect }) => {
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors capitalize
                 ${
                   resourceType === type
-                    ? "bg-indigo-600 text-white"
-                    : "text-zinc-400 hover:text-white hover:bg-zinc-800"
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
                 }`}
               >
                 {type}
@@ -170,26 +178,28 @@ const FileManager = ({ isModal = false, resType = "all", onSelect }) => {
       </div>
 
       {/* Content */}
-      <FileGrid
-        files={files}
-        onDelete={handleDelete}
-        onPreview={handlePreview}
-        onSelect={onSelect}
-        isModal={isModal}
-        loading={loading && !nextCursor}
-      />
+      <div className={isModal ? "" : "flex-1 overflow-y-auto min-h-0 pr-1"}>
+        <FileGrid
+          files={files}
+          onDelete={handleDelete}
+          onPreview={handlePreview}
+          onSelect={onSelect}
+          isModal={isModal}
+          loading={loading && !nextCursor}
+        />
 
-      {/* Load More */}
-      {nextCursor && (
-        <div className="flex justify-center pt-8">
-          <Button
-            label="Load More"
-            onClick={() => loadMedia(false, nextCursor)}
-            uiType="secondary"
-            disabled={loading}
-          />
-        </div>
-      )}
+        {/* Load More */}
+        {nextCursor && (
+          <div className="flex justify-center pt-8 pb-4">
+            <Button
+              label="Load More"
+              onClick={() => loadMedia(false, nextCursor)}
+              uiType="secondary"
+              disabled={loading}
+            />
+          </div>
+        )}
+      </div>
 
       <Modal
         title="Preview Video"

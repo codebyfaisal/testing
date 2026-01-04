@@ -18,7 +18,7 @@ router.route("/portfolio").get(getPortfolioProfile);
 // Secured routes
 router.route("/logout").post(verifyJWT, logoutUser);
 
-router.route("/me").get(verifyJWT, getUser).patch(verifyJWT, updateUser);
+router.route("/me").get(verifyJWT, getUser).put(verifyJWT, updateUser);
 
 router.route("/me/change-password").post(verifyJWT, changePassword);
 router.route("/me/config").get(verifyJWT, getConfig).post(verifyJWT, updateConfig)

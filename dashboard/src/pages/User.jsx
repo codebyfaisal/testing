@@ -1,15 +1,12 @@
 import React, { useEffect, useState, useMemo } from "react";
-import useDashboardStore from "../store/useDashboardStore";
+
 import { FaSave } from "react-icons/fa";
 import {
   Button,
   ConfirmationModal,
   UnsavedChangesNotifier,
-} from "../components";
-import toast from "react-hot-toast";
-import { useBlocker } from "react-router-dom";
-
-import {
+  PageHeader,
+  ProfileSkeleton,
   UserMedia,
   UserPersonalDetails,
   UserStats,
@@ -18,10 +15,13 @@ import {
   UserExperience,
   UserEducation,
   UserSecurity,
-} from "../components/user";
+} from "@/components";
+import toast from "react-hot-toast";
+import { useBlocker } from "react-router-dom";
+import useDashboardStore from "@/store/useDashboardStore";
 
 const User = () => {
-  const { data, getUser, updateUser, isLoading } = useDashboardStore();
+  const { user, getUser, updateUser, isLoading } = useDashboardStore();
 
   const [formData, setFormData] = useState({
     username: "",
@@ -36,6 +36,7 @@ const User = () => {
     experience: [],
     education: [],
     projectsCompleted: 0,
+    yearOfExperience: 0,
     happyClients: 0,
     resume: "",
     introVideo: "",
@@ -48,42 +49,39 @@ const User = () => {
   }, []);
 
   useEffect(() => {
-    if (data?.user) {
+    if (user) {
       let experienceArray = [];
-      let yearOfExperienceVal = data.user.stats?.yearOfExperience || 0;
+      let yearOfExperienceVal = user.stats?.yearOfExperience || 0;
 
-      if (Array.isArray(data.user.experience))
-        experienceArray = data.user.experience;
-      else if (typeof data.user.stats?.yearOfExperience === "number")
+      if (Array.isArray(user.experience)) experienceArray = user.experience;
+      else if (typeof user.stats?.yearOfExperience === "number")
         if (!yearOfExperienceVal)
-          yearOfExperienceVal = data.user.stats.yearOfExperience;
+          yearOfExperienceVal = user.stats.yearOfExperience;
 
       const mappedData = {
-        avatar: data.user.avatar || "",
-        username: data.user.username || "",
-        name: data.user.name || { first: "", last: "" },
-        email: data.user.email || "",
-        bio: data.user.bio || "",
-        phone: data.user.phone || "",
-        address: data.user.address || "",
-        socialLinks: data.user.socialLinks || {},
-        skills: data.user.skills || [],
+        avatar: user.avatar || "",
+        username: user.username || "",
+        name: user.name || { first: "", last: "" },
+        email: user.email || "",
+        bio: user.bio || "",
+        phone: user.phone || "",
+        address: user.address || "",
+        socialLinks: user.socialLinks || {},
+        skills: user.skills || [],
         yearOfExperience: yearOfExperienceVal,
-        projectsCompleted: data.user.stats?.projectsCompleted || 0,
-        happyClients: data.user.stats?.happyClients || 0,
+        projectsCompleted: user.stats?.projectsCompleted || 0,
+        happyClients: user.stats?.happyClients || 0,
         experience: experienceArray,
-        education: Array.isArray(data.user.education)
-          ? data.user.education
-          : [],
-        resume: data.user.resume || "",
-        introVideo: data.user.introVideo || "",
-        password: "", // Password is always reset/empty initially
+        education: Array.isArray(user.education) ? user.education : [],
+        resume: user.resume || "",
+        introVideo: user.introVideo || "",
+        password: "",
       };
 
       setFormData(mappedData);
       setInitialData(mappedData);
     }
-  }, [data?.user]);
+  }, [user]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -107,11 +105,35 @@ const User = () => {
   const [saveError, setSaveError] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
+  // Helper for deep comparison
+  const isDeepEqual = (obj1, obj2) => {
+    if (obj1 === obj2) return true;
+    if (
+      typeof obj1 !== "object" ||
+      obj1 === null ||
+      typeof obj2 !== "object" ||
+      obj2 === null
+    )
+      return false;
+
+    const keys1 = Object.keys(obj1);
+    const keys2 = Object.keys(obj2);
+
+    if (keys1.length !== keys2.length) return false;
+
+    for (const key of keys1) {
+      if (!keys2.includes(key) || !isDeepEqual(obj1[key], obj2[key]))
+        return false;
+    }
+
+    return true;
+  };
+
   // Check if form is dirty
   const isDirty = useMemo(() => {
     if (!initialData) return false;
-    // Simple deep comparison suitable for this data structure
-    return JSON.stringify(formData) !== JSON.stringify(initialData);
+    // Use deep equal instead of JSON.stringify to avoid key order issues
+    return !isDeepEqual(formData, initialData);
   }, [formData, initialData]);
 
   // Block navigation if dirty
@@ -142,14 +164,9 @@ const User = () => {
       await updateUser(dataToUpdate);
       toast.success("User profile updated successfully!");
 
-      // Update initial data to current on success
-      setInitialData(formData);
       setIsConfirmOpen(false);
 
-      // If blocked, proceed
-      if (blocker.state === "blocked") {
-        blocker.proceed();
-      }
+      if (blocker.state === "blocked") blocker.proceed();
     } catch (error) {
       console.error("Update failed", error);
       toast.error(error.message || "Failed to update profile.");
@@ -168,71 +185,83 @@ const User = () => {
 
   const handleDiscardChanges = () => {
     setIsConfirmOpen(false);
-    if (blocker.state === "blocked") {
-      blocker.proceed();
-    }
+    if (blocker.state === "blocked") blocker.proceed();
   };
 
-  if (isLoading && !data?.user)
-    return <div className="text-white">Loading...</div>;
+  if (isLoading && !user) return <ProfileSkeleton />;
+
+  const noOfSocials = Object.values(formData?.socialLinks || {}).filter(
+    (link) => link !== ""
+  ).length;
 
   return (
-    <div className="pt-6 pb-20">
-      <header className="mb-6">
-        <h1 className="text-3xl font-bold text-white mb-2">Profile</h1>
-        <p className="text-zinc-400">
-          Manage your personal information, stats, and portfolio settings.
-        </p>
-      </header>
-
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Profile Card & Media - Standard Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-          <UserPersonalDetails
-            formData={formData}
-            handleChange={handleChange}
-            className="lg:col-span-3"
-          />
-          <UserMedia
-            formData={formData}
-            setFormData={setFormData}
-            className="lg:col-span-2"
+    <>
+      <div className="h-screen flex flex-col space-y-4">
+        <div className="mb-2">
+          <PageHeader
+            title="Profile"
+            description="Manage your personal information, stats, and portfolio settings."
           />
         </div>
 
-        {/* Experience & Education */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <UserExperience formData={formData} setFormData={setFormData} />
-          <UserEducation formData={formData} setFormData={setFormData} />
+        <div className="flex-1 overflow-y-auto min-h-0 pr-1 space-y-6 content4 relative pb-20">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Profile Card & Media - Standard Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+              <UserPersonalDetails
+                formData={formData}
+                handleChange={handleChange}
+                className="lg:col-span-3"
+              />
+              <UserMedia
+                formData={formData}
+                setFormData={setFormData}
+                className="lg:col-span-2"
+              />
+            </div>
+
+            {/* Experience & Education */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <UserExperience formData={formData} setFormData={setFormData} />
+              <UserEducation formData={formData} setFormData={setFormData} />
+            </div>
+
+            {/* Skills & Socials */}
+            <div className="grid md:grid-cols-3 gap-6">
+              <UserSkills
+                formData={formData}
+                setFormData={setFormData}
+                className="md:col-span-2"
+              />
+              <UserStats formData={formData} handleChange={handleChange} />
+            </div>
+
+            <UserSocials
+              formData={formData}
+              setFormData={setFormData}
+              noOfSocials={noOfSocials}
+            />
+
+            <div className="sticky -bottom-10 right-0 z-50 w-full flex justify-end">
+              <Button
+                uiType="primary"
+                onClick={handleSubmit}
+                disabled={!isDirty}
+                label="Save Changes"
+                icon={<FaSave size={14} />}
+                className={`font-semibold px-8 py-3 shadow-xl backdrop-blur-md transition-all ${
+                  !isDirty
+                    ? "bg-muted text-muted-foreground cursor-not-allowed opacity-50"
+                    : "bg-primary text-primary-foreground hover:opacity-90"
+                }`}
+              />
+            </div>
+          </form>
+
+          {/* Security / Password */}
+          <UserSecurity />
         </div>
-
-        {/* Skills & Socials */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <UserSkills formData={formData} setFormData={setFormData} />
-          <UserSocials formData={formData} setFormData={setFormData} />
-        </div>
-
-        {/* Details & Stats */}
-        <UserStats formData={formData} handleChange={handleChange} />
-
-        <div className="flex justify-end pt-4 sticky bottom-4">
-          <Button
-            uiType="primary"
-            onClick={handleSubmit}
-            disabled={!isDirty}
-            label="Save Changes"
-            icon={<FaSave size={14} />}
-            className={`font-semibold px-8 py-3 shadow-xl backdrop-blur-md ${
-              !isDirty
-                ? "bg-zinc-700 text-zinc-400 cursor-not-allowed"
-                : "bg-indigo-600/90 hover:bg-indigo-600"
-            }`}
-          />
-        </div>
-
-        {/* Security / Password */}
-        <UserSecurity />
-      </form>
+      </div>
 
       <UnsavedChangesNotifier
         isDirty={isDirty}
@@ -262,7 +291,7 @@ const User = () => {
         cancelText={blocker.state === "blocked" ? "Discard & Leave" : "Cancel"}
         isDangerous={false}
       />
-    </div>
+    </>
   );
 };
 

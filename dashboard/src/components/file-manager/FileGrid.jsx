@@ -1,6 +1,6 @@
 import React from "react";
-import FileItem from "./FileItem";
-import { FileSkeleton } from "../../components";
+import { FileItem, FileSkeleton } from "@/components";
+import { cn } from "@/lib/utils";
 
 const FileGrid = ({
   files,
@@ -13,9 +13,10 @@ const FileGrid = ({
   if (loading) {
     return (
       <div
-        className={`grid grid-cols-2 md:grid-cols-3 ${
+        className={cn(
+          "grid grid-cols-2 md:grid-cols-3",
           isModal ? "lg:grid-cols-4" : "lg:grid-cols-5"
-        } gap-4`}
+        )}
       >
         <FileSkeleton />
       </div>
@@ -24,16 +25,17 @@ const FileGrid = ({
 
   if (!loading && (!files || files.length === 0))
     return (
-      <div className="flex flex-col items-center justify-center py-20 text-zinc-500">
+      <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
         <p>No files found.</p>
       </div>
     );
 
   return (
     <div
-      className={`grid grid-cols-2 md:grid-cols-3 ${
+      className={cn(
+        "grid grid-cols-2 md:grid-cols-3 gap-4",
         isModal ? "lg:grid-cols-4" : "lg:grid-cols-5"
-      } gap-4`}
+      )}
     >
       {files.map((file) => (
         <FileItem

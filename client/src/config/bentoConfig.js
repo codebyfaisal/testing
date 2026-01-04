@@ -1,4 +1,4 @@
-export const bentoItems = [
+const bentoItemsConfig = [
     {
         id: "about",
         component: "AboutPreview",
@@ -42,3 +42,5 @@ export const bentoItems = [
         className: "md:col-span-2 md:row-span-3",
     },
 ];
+
+export default bentoItemsConfig

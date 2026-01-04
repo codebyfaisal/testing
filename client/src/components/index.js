@@ -1,51 +1,38 @@
-import { Button } from "./Button";
-import Navbar from "./Navbar";
-import ErrorBoundary from "./ErrorBoundary";
-import Hero from "./Hero";
-import AboutPreview from "./AboutPreview";
-import ServicesPreview from "./ServicesPreview";
-import ProjectsPreview from "./ProjectsPreview";
-import ContactPreview from "./ContactPreview";
-import Footer from "./Footer";
-import Layout from "./Layout";
-import Testimonials from "./Testimonials";
-import Universe from "./Universe";
-import PageHeader from "./PageHeader";
-import Plans from "./Plans";
-import ScrollToTop from "./ScrollToTop";
-import Loader from "./Loader";
-import SEO from "./SEO";
-import SocialIcon from "./SocialIcon";
-import RenderIcon from "./RenderIcon";
-import { Skeleton } from "./Skeleton";
-import VideoModal from "./VideoModal";
-import CTA from "./CTA";
-import ImageSlider from "./ImageSlider";
-import PrivacyBanner from "./PrivacyBanner";
+// Core Components
+export { default as Button } from "./ui/Button";
+export { default as Hero } from "./Hero";
+export { default as Layout } from "./layout/Layout";
+export { default as Navbar } from "./layout/Navbar";
+export { default as PageHeader } from "./layout/PageHeader";
+export { default as Footer } from "./layout/Footer";
+export { default as Loader } from "./ui/Loader";
+export { default as ErrorBoundary } from "./ui/ErrorBoundary";
+export { default as ScrollToTop } from "./ScrollToTop";
+export { default as SEO } from "./SEO";
+export { default as ThemeToggle } from "./ThemeToggle";
+export { default as PrivacyBanner } from "./PrivacyBanner";
 
-export {
-    Button,
-    Navbar,
-    Hero,
-    AboutPreview,
-    ServicesPreview,
-    ProjectsPreview,
-    ContactPreview,
-    Footer,
-    Layout,
-    Testimonials,
-    PageHeader,
-    Plans,
-    ScrollToTop,
-    Loader,
-    SEO,
-    Universe,
-    SocialIcon,
-    RenderIcon,
-    ErrorBoundary,
-    Skeleton,
-    VideoModal,
-    CTA,
-    ImageSlider,
-    PrivacyBanner
-};
+// UI Components
+export { default as Input } from "./ui/Input";
+export { default as Select } from "./ui/Select";
+export { default as Textarea } from "./ui/Textarea";
+export { default as RenderIcon } from "./ui/RenderIcon";
+export { default as SocialIcons } from "./ui/SocialIcons";
+export { default as BentoItem } from "./universe/BentoItem";
+export { default as BentoGrid } from "./universe/BentoGrid";
+export { default as VideoModal } from "./VideoModal";
+export { default as ImageSlider } from "./ImageSlider";
+export { default as Newsletter } from "./Newsletter";
+export { default as ApplicationForm } from "./ApplicationForm";
+export { default as Plans } from "./Plans";
+export { default as Testimonials } from "./Testimonials";
+export { default as Universe } from "./universe/Universe";
+export { default as NotFound } from "../pages/NotFound";
+export * from "./universe/previews/Illustrations";
+
+// Skeletons
+export { default as Skeleton } from "./skeletons/Skeleton";
+export { default as CardSkeleton } from "./skeletons/CardSkeleton";
+export { default as DetailSkeleton } from "./skeletons/DetailSkeleton";
+export { default as TrackSkeleton } from "./skeletons/TrackSkeleton";
+

@@ -1,7 +1,7 @@
 import axios from "axios";
+import usePortfolioStore from "../store/usePortfolioStore";
 
-export const BASE_API_URL = "http://localhost:4000/api/v1";
-// export const BASE_API_URL = "https://testing-psi-pied.vercel.app/api/v1"
+export const BASE_API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000/api/v1";
 
 const api = axios.create({
     baseURL: BASE_API_URL,
@@ -15,6 +15,10 @@ api.interceptors.request.use(
 api.interceptors.response.use(
     (response) => response,
     (error) => {
+        if (!error.response || error.response.status >= 500) {
+            usePortfolioStore.getState().setServerError(true);
+        }
+
         const message = error.response?.data?.message || "Something went wrong";
         console.error("API Error:", message);
         return Promise.reject(error);

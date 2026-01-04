@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import { motion } from "motion/react";
 import { FaBriefcase, FaPlus, FaTrash } from "react-icons/fa";
-import { Input, Button, Modal } from "../../components";
+import { Input, Button, Modal, Card } from "@/components";
 
 const UserExperience = ({ formData, setFormData }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -47,15 +46,10 @@ const UserExperience = ({ formData, setFormData }) => {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.25 }}
-      className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6"
-    >
+    <Card>
       <div className="flex justify-between items-center mb-6">
-        <h3 className="text-lg font-bold text-white flex items-center gap-2">
-          <FaBriefcase className="text-indigo-500" /> Work Experience
+        <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
+          <FaBriefcase className="text-primary" /> Work Experience
         </h3>
         <Button
           onClick={() => setIsModalOpen(true)}
@@ -63,6 +57,37 @@ const UserExperience = ({ formData, setFormData }) => {
           icon={<FaPlus size={12} />}
           label="Add Experience"
         />
+      </div>
+
+      {/* List Experience */}
+      <div className="space-y-4">
+        {formData.experience.map((exp, index) => (
+          <Card
+            key={index}
+            className="bg-muted/30 relative group"
+            padding="p-4"
+          >
+            <Button
+              onClick={() => handleRemoveExperience(index)}
+              uiType="text"
+              icon={<FaTrash />}
+              className="absolute top-4 right-4 text-muted-foreground opacity-0 group-hover:opacity-100 w-auto group-hover:hover:text-destructive"
+            />
+            <h4 className="font-bold text-foreground">{exp.role}</h4>
+            <p className="text-primary text-sm">{exp.company}</p>
+            <p className="text-muted-foreground text-xs mt-1">
+              {new Date(exp.startDate).toLocaleDateString()} -{" "}
+              {exp.current
+                ? "Present"
+                : new Date(exp.endDate).toLocaleDateString()}
+            </p>
+            {exp.description && (
+              <p className="text-muted-foreground text-sm mt-2">
+                {exp.description}
+              </p>
+            )}
+          </Card>
+        ))}
       </div>
 
       <Modal
@@ -127,14 +152,17 @@ const UserExperience = ({ formData, setFormData }) => {
                   current: e.target.checked,
                 })
               }
-              className="rounded border-zinc-800 bg-zinc-900 text-indigo-600 focus:ring-indigo-500"
+              className="rounded border-border bg-muted text-primary focus:ring-primary"
             />
-            <label htmlFor="currentRole" className="text-sm text-zinc-400">
+            <label
+              htmlFor="currentRole"
+              className="text-sm text-muted-foreground"
+            >
               I currently work here
             </label>
           </div>
           <div className="space-y-2">
-            <label className="text-sm font-medium text-zinc-300">
+            <label className="text-sm font-medium text-muted-foreground">
               Description
             </label>
             <textarea
@@ -146,7 +174,7 @@ const UserExperience = ({ formData, setFormData }) => {
                 })
               }
               rows={3}
-              className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-indigo-500 transition-colors resize-none placeholder-zinc-600"
+              className="w-full bg-input border border-border rounded-lg px-4 py-3 text-foreground focus:outline-none focus:border-primary transition-colors resize-none placeholder-muted-foreground"
             />
           </div>
           <div className="flex justify-end gap-2 pt-4">
@@ -163,35 +191,7 @@ const UserExperience = ({ formData, setFormData }) => {
           </div>
         </div>
       </Modal>
-
-      {/* List Experience */}
-      <div className="space-y-4">
-        {formData.experience.map((exp, index) => (
-          <div
-            key={index}
-            className="bg-zinc-950 border border-zinc-800 rounded-xl p-4 relative group"
-          >
-            <Button
-              onClick={() => handleRemoveExperience(index)}
-              uiType="text"
-              icon={<FaTrash />}
-              className="absolute top-4 right-4 text-zinc-500 opacity-0 group-hover:opacity-100 w-auto group-hover:hover:text-red-500"
-            />
-            <h4 className="font-bold text-white">{exp.role}</h4>
-            <p className="text-indigo-400 text-sm">{exp.company}</p>
-            <p className="text-zinc-500 text-xs mt-1">
-              {new Date(exp.startDate).toLocaleDateString()} -{" "}
-              {exp.current
-                ? "Present"
-                : new Date(exp.endDate).toLocaleDateString()}
-            </p>
-            {exp.description && (
-              <p className="text-zinc-400 text-sm mt-2">{exp.description}</p>
-            )}
-          </div>
-        ))}
-      </div>
-    </motion.div>
+    </Card>
   );
 };
 

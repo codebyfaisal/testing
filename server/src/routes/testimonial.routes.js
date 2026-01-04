@@ -10,6 +10,6 @@ import {
 const router = Router();
 
 router.route("/").get(getAllTestimonials).post(createTestimonial);
-router.route("/:id").get(getTestimonialById).patch(updateTestimonial).delete(deleteTestimonial);
+router.route("/:id").get(getTestimonialById).put(updateTestimonial).delete(deleteTestimonial);
 
 export default router;

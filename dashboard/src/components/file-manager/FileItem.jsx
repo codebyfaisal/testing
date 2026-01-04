@@ -9,6 +9,7 @@ import {
   FaPlay,
 } from "react-icons/fa";
 import toast from "react-hot-toast";
+import { Card } from "@/components";
 
 const FileItem = ({ file, onDelete, onClick, onSelect, isModal }) => {
   const isImage = file.resource_type === "image" && file.format !== "pdf";
@@ -32,13 +33,14 @@ const FileItem = ({ file, onDelete, onClick, onSelect, isModal }) => {
   };
 
   return (
-    <div
-      className={`group relative bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden hover:border-zinc-700 transition-all ${
-        onSelect ? "cursor-pointer hover:border-indigo-500" : ""
+    <Card
+      padding="p-0"
+      className={`group relative overflow-hidden hover:border-primary transition-all ${
+        onSelect ? "cursor-pointer hover:border-primary" : ""
       }`}
       onClick={() => onSelect && onSelect(file)}
     >
-      <div className="aspect-square w-full bg-zinc-950 flex items-center justify-center overflow-hidden">
+      <div className="aspect-square w-full bg-muted/20 flex items-center justify-center overflow-hidden">
         {isImage ? (
           <img
             src={file.secure_url}
@@ -46,7 +48,7 @@ const FileItem = ({ file, onDelete, onClick, onSelect, isModal }) => {
             className="w-full h-full object-cover transition-transform group-hover:scale-110"
           />
         ) : isVideo ? (
-          <div className="text-zinc-500 flex flex-col items-center">
+          <div className="text-muted-foreground flex flex-col items-center">
             <FaVideo size={48} />
             <span className="mt-2 text-xs">Video</span>
           </div>
@@ -56,23 +58,23 @@ const FileItem = ({ file, onDelete, onClick, onSelect, isModal }) => {
             <span className="mt-2 text-xs">PDF</span>
           </div>
         ) : (
-          <div className="text-zinc-500 flex flex-col items-center">
+          <div className="text-muted-foreground flex flex-col items-center">
             <FaImage size={48} />
             <span className="mt-2 text-xs">File</span>
           </div>
         )}
 
         {/* Overlay Actions */}
-        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+        <div className="absolute inset-0 bg-background/80 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
           {onSelect ? (
-            <span className="text-white text-xs font-bold bg-indigo-600 px-3 py-1.5 rounded-lg shadow-lg transform scale-95 group-hover:scale-100 transition-transform">
+            <span className="text-primary-foreground text-xs font-bold bg-primary px-3 py-1.5 rounded-lg shadow-lg transform scale-95 group-hover:scale-100 transition-transform">
               Select
             </span>
           ) : (
             <>
               <button
                 onClick={handleCopyLink}
-                className="p-2 bg-white/10 hover:bg-white/20 text-white rounded-full backdrop-blur-sm transition-colors"
+                className="p-2 bg-muted hover:bg-muted/80 text-foreground rounded-full backdrop-blur-sm transition-colors"
                 title="Copy Link"
               >
                 <FaCopy />
@@ -87,7 +89,7 @@ const FileItem = ({ file, onDelete, onClick, onSelect, isModal }) => {
               {(isImage || isVideo) && (
                 <button
                   onClick={handlePreview}
-                  className="p-2 bg-white/10 hover:bg-white/20 text-white rounded-full backdrop-blur-sm transition-colors"
+                  className="p-2 bg-muted hover:bg-muted/80 text-foreground rounded-full backdrop-blur-sm transition-colors"
                   title="Preview"
                 >
                   {isVideo ? <FaPlay /> : <FaEye />}
@@ -98,19 +100,19 @@ const FileItem = ({ file, onDelete, onClick, onSelect, isModal }) => {
         </div>
       </div>
 
-      <div className="p-3 border-t border-zinc-800 bg-zinc-900">
+      <Card className="border-0 border-t" padding="p-3" rounded="rounded-0">
         <p
-          className="text-xs text-zinc-400 truncate font-mono"
+          className="text-xs text-muted-foreground truncate font-mono"
           title={file.public_id}
         >
           {file.public_id.split("/").pop()}
         </p>
-        <div className="flex justify-between items-center mt-2 text-[10px] text-zinc-500">
+        <div className="flex justify-between items-center mt-2 text-[10px] text-muted-foreground">
           <span className="uppercase">{file.format}</span>
           <span>{(file.bytes / 1024).toFixed(0)} KB</span>
         </div>
-      </div>
-    </div>
+      </Card>
+    </Card>
   );
 };
 

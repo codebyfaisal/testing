@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import { motion } from "motion/react";
 import { FaCode, FaPlus } from "react-icons/fa";
-import { Input, Button, RenderIcon } from "../../components";
+import { Input, Button, RenderIcon, Card } from "@/components";
+import defaultIcons from "@/defaultIcons";
 
-const UserSkills = ({ formData, setFormData }) => {
+const UserSkills = ({ formData, setFormData, className = "" }) => {
   const [newSkill, setNewSkill] = useState({
     name: "",
-    icon: "",
+    icon: defaultIcons.techStack,
     isTechStack: false,
   });
 
@@ -18,9 +18,20 @@ const UserSkills = ({ formData, setFormData }) => {
     ) {
       setFormData((prev) => ({
         ...prev,
-        skills: [...prev.skills, { ...newSkill, name: newSkill.name.trim() }],
+        skills: [
+          ...prev.skills,
+          {
+            ...newSkill,
+            name: newSkill.name.trim(),
+            icon: newSkill.icon.trim() || defaultIcons.techStack,
+          },
+        ],
       }));
-      setNewSkill({ name: "", icon: "", isTechStack: false });
+      setNewSkill({
+        name: "",
+        icon: defaultIcons.techStack,
+        isTechStack: false,
+      });
     }
   };
 
@@ -32,41 +43,41 @@ const UserSkills = ({ formData, setFormData }) => {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.3 }}
-      className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6"
-    >
-      <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
-        <FaCode className="text-indigo-500" /> Skills
+    <Card className={className}>
+      <h3 className="text-lg font-bold text-foreground mb-6 flex items-center gap-2">
+        <FaCode className="text-primary" /> Skills
       </h3>
       <div className="space-y-4">
         <div className="space-y-4">
-          <div className="flex flex-col gap-4 p-4 bg-zinc-950/50 rounded-xl border border-zinc-800/50">
+          <Card
+            className="flex flex-col gap-4 bg-muted/30"
+            padding="p-4"
+          >
+            <Input
+              label="Skill Name"
+              value={newSkill.name}
+              onChange={(e) =>
+                setNewSkill({ ...newSkill, name: e.target.value })
+              }
+              placeholder="Skill Name (e.g. React)"
+              className="col-span-11"
+            />
             <div className="relative grid grid-cols-12 gap-2">
               <Input
-                label="Skill Name"
-                value={newSkill.name}
+                label="Icon (choose icons from Iconify OR SimpleIcons)"
+                value={newSkill.icon}
                 onChange={(e) =>
-                  setNewSkill({ ...newSkill, name: e.target.value })
+                  setNewSkill({ ...newSkill, icon: e.target.value })
                 }
-                placeholder="Skill Name (e.g. React)"
-                className="col-span-11"
+                placeholder="SVG or Icon URL or Icon Name or Please read the documentation"
+                className="col-span-10"
               />
               <RenderIcon
                 icon={newSkill.icon}
-                className="col-span-1 translate-y-[15%]"
+                className="col-span-2 translate-y-[15%]"
+                defaultIcon={defaultIcons.techStack}
               />
             </div>
-            <Input
-              label="Icon (choose icons from Iconify OR SimpleIcons)"
-              value={newSkill.icon}
-              onChange={(e) =>
-                setNewSkill({ ...newSkill, icon: e.target.value })
-              }
-              placeholder="SVG or Icon URL or Icon Name or Please read the documentation"
-            />
             <div className="flex gap-2">
               <a
                 href={"https://simpleicons.org/"}
@@ -97,9 +108,12 @@ const UserSkills = ({ formData, setFormData }) => {
                       isTechStack: e.target.checked,
                     })
                   }
-                  className="rounded border-zinc-800 bg-zinc-900 text-indigo-600 focus:ring-indigo-500"
+                  className="rounded border-border bg-muted text-primary focus:ring-primary"
                 />
-                <label htmlFor="isTechStack" className="text-sm text-zinc-400">
+                <label
+                  htmlFor="isTechStack"
+                  className="text-sm text-muted-foreground"
+                >
                   Show in Tech Stack
                 </label>
               </div>
@@ -111,20 +125,25 @@ const UserSkills = ({ formData, setFormData }) => {
                 disabled={!newSkill.name}
               />
             </div>
-          </div>
+          </Card>
 
           <div className="flex flex-wrap gap-2">
             {formData.skills.map((skill, index) => (
-              <div
+              <Card
                 key={index}
-                className={`px-3 py-2 rounded-lg text-sm flex items-center gap-3 border transition-colors ${
+                className={`px-3 py-2 text-sm flex items-center gap-3 transition-colors ${
                   skill.isTechStack
-                    ? "bg-indigo-500/10 text-indigo-400 border-indigo-500/20"
-                    : "bg-zinc-800/50 text-zinc-400 border-zinc-700/50"
+                    ? "bg-primary/10 text-primary border-primary/20"
+                    : "bg-muted/50 text-muted-foreground"
                 }`}
+                rounded="rounded-2xl"
+                padding="p-0"
               >
                 <span className="text-lg">
-                  <RenderIcon icon={skill.icon} />
+                  <RenderIcon
+                    icon={skill.icon}
+                    defaultIcon={defaultIcons.techStack}
+                  />
                 </span>
                 <div className="flex flex-col">
                   <span className="font-medium leading-none">{skill.name}</span>
@@ -137,21 +156,21 @@ const UserSkills = ({ formData, setFormData }) => {
                 <button
                   onClick={() => handleRemoveSkill(skill)}
                   type="button"
-                  className="ml-1 hover:text-red-400 transition-colors w-5 h-5 flex items-center justify-center rounded-full hover:bg-white/5"
+                  className="ml-1 hover:text-destructive transition-colors w-5 h-5 flex items-center justify-center rounded-full hover:bg-muted"
                 >
                   &times;
                 </button>
-              </div>
+              </Card>
             ))}
             {formData.skills.length === 0 && (
-              <p className="text-zinc-500 text-sm italic w-full text-center py-4">
+              <p className="text-muted-foreground text-sm italic w-full text-center py-4">
                 No skills added yet.
               </p>
             )}
           </div>
         </div>
       </div>
-    </motion.div>
+    </Card>
   );
 };
 

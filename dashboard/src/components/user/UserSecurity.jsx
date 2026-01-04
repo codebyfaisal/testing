@@ -1,10 +1,8 @@
 import React, { useState } from "react";
-import { motion } from "motion/react";
+
 import { FaLock } from "react-icons/fa";
-import Input from "../Input";
-import Button from "../Button";
-import Modal from "../Modal";
-import useDashboardStore from "../../store/useDashboardStore";
+import { Input, Button, Modal, Card } from "@/components";
+import useDashboardStore from "@/store/useDashboardStore";
 import toast from "react-hot-toast";
 
 const UserSecurity = () => {
@@ -61,16 +59,14 @@ const UserSecurity = () => {
 
   return (
     <>
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5 }}
-        className="bg-zinc-900 border border-yellow-800 rounded-2xl p-6"
-      >
-        <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
-          <FaLock className="text-yellow-500" /> Security
+      <Card className="ring ring-inset ring-yellow-700">
+        <h3 className="text-lg font-bold text-foreground mb-6 flex items-center gap-2">
+          <FaLock className="text-primary" /> Security
         </h3>
-        <form className="space-y-2 grid grid-cols-1 sm:grid-cols-10 gap-2">
+        <form
+          className="space-y-2 grid grid-cols-1 sm:grid-cols-10 gap-2"
+          onSubmit={handleInitialSubmit}
+        >
           <Input
             label="New Password"
             type="password"
@@ -90,7 +86,7 @@ const UserSecurity = () => {
             />
           </div>
         </form>
-      </motion.div>
+      </Card>
 
       <Modal
         isOpen={isModalOpen}

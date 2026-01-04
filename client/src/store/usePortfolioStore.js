@@ -6,9 +6,15 @@ const usePortfolioStore = create((set) => ({
     loading: true,
     error: null,
     isRounded: false,
+    rounded: "",
     config: {},
     user: {},
     plans: [],
+    serverError: false,
+    mobileMenuOpen: false,
+    setMobileMenuOpen: (open) => set({ mobileMenuOpen: open }),
+
+    setServerError: (status) => set({ serverError: status }),
 
     fetchData: async () => {
         set({ loading: true, error: null });
@@ -18,6 +24,7 @@ const usePortfolioStore = create((set) => ({
                 data,
                 loading: false,
                 isRounded: data?.config?.appearance?.theme?.borderRadius || false,
+                rounded: data?.config?.appearance?.theme?.borderRadius ? "rounded-3xl" : "",
                 config: data?.config,
                 user: data?.user,
                 plans: data?.plans

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import useDashboardStore from "../store/useDashboardStore";
+import useDashboardStore from "@/store/useDashboardStore";
 import { useNavigate } from "react-router-dom";
-import { Input, Button } from "../components";
+import { Input, Button, Card } from "@/components";
 import { FaSignInAlt } from "react-icons/fa";
 
 const Register = () => {
@@ -25,17 +25,17 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center p-4">
-      <div className="bg-zinc-900 border border-zinc-800 p-8 rounded-xl w-full max-w-md">
-        <h1 className="text-2xl font-bold text-white mb-2">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <Card className="w-full max-w-md" padding="p-8">
+        <h1 className="text-2xl font-bold text-foreground mb-2">
           Setup Admin Account
         </h1>
-        <p className="text-zinc-400 mb-6">
+        <p className="text-muted-foreground mb-6">
           Create the owner account for this portfolio.
         </p>
 
         {error && (
-          <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-lg mb-6 text-sm">
+          <div className="bg-destructive/10 border border-destructive/20 text-destructive p-3 rounded-lg mb-6 text-sm">
             {error}
           </div>
         )}
@@ -114,7 +114,7 @@ const Register = () => {
             label={isLoading ? "Creating Account..." : "Create Account"}
           />
         </form>
-      </div>
+      </Card>
     </div>
   );
 };

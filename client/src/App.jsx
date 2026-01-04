@@ -1,12 +1,15 @@
 import React, { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
+import { Toaster } from "react-hot-toast";
+
 import {
   Layout,
   ScrollToTop,
-  SEO,
   ErrorBoundary,
+  SEO,
   PrivacyBanner,
-} from "./components";
+} from "@/components";
 import {
   Home,
   About,
@@ -16,14 +19,32 @@ import {
   ProjectDetail,
   Contact,
   NotFound,
-} from "./pages";
-import usePortfolioStore from "./store/usePortfolioStore";
-import { Toaster } from "react-hot-toast";
-import { BASE_API_URL } from "./api/axios";
+  Blogs,
+  BlogPost,
+  Careers,
+  JobDetail,
+  FormView,
+  TrackApplication,
+  ServerError,
+} from "@/pages";
+import usePortfolioStore from "@/store/usePortfolioStore";
+import { BASE_API_URL } from "@/api/axios";
+
+import { ThemeProvider } from "@/context/ThemeContext";
 
 function App() {
-  const { fetchData, config } = usePortfolioStore();
+  const { fetchData, config, serverError } = usePortfolioStore();
 
+  if (serverError) return <ServerError />;
+
+  return (
+    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+      <InnerApp config={config} fetchData={fetchData} />
+    </ThemeProvider>
+  );
+}
+
+function InnerApp({ config, fetchData }) {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
@@ -82,9 +103,7 @@ function App() {
       if (isCustom && colors) {
         if (colors.secondary)
           root.style.setProperty("--color-secondary", colors.secondary);
-      } else {
-        root.style.removeProperty("--color-secondary");
-      }
+      } else root.style.removeProperty("--color-secondary");
     }
   }, [config]);
 
@@ -102,8 +121,6 @@ function App() {
             },
           }}
         />
-        <PrivacyBanner />
-        <ScrollToTop />
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={<Home />} />
@@ -112,10 +129,18 @@ function App() {
             <Route path="services/:id" element={<ServiceDetail />} />
             <Route path="projects" element={<Projects />} />
             <Route path="projects/:id" element={<ProjectDetail />} />
+            <Route path="blogs" element={<Blogs />} />
+            <Route path="blogs/:slug" element={<BlogPost />} />
+            <Route path="careers" element={<Careers />} />
+            <Route path="careers/:id" element={<JobDetail />} />
+            <Route path="forms/:id" element={<FormView />} />
+            <Route path="track-application" element={<TrackApplication />} />
             <Route path="contact" element={<Contact />} />
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>
+        <PrivacyBanner />
+        <ScrollToTop />
       </ErrorBoundary>
     </Router>
   );

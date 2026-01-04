@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { FaEnvelope, FaPlus, FaTrash } from "react-icons/fa";
-import { Input, Button } from "../";
+import { ColorPicker } from "antd";
+import { Input, Button, Card } from "@/components";
 
 const ConfigMessageTypes = ({ messageTypes = [], onChange }) => {
   const [newMessageType, setNewMessageType] = useState({
@@ -43,9 +44,9 @@ const ConfigMessageTypes = ({ messageTypes = [], onChange }) => {
   };
 
   return (
-    <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
-      <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-        <FaEnvelope className="text-indigo-500" /> Message Types
+    <Card>
+      <h3 className="text-xl font-bold text-foreground mb-6 flex items-center gap-2">
+        <FaEnvelope className="text-primary" /> Message Types
       </h3>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -61,18 +62,24 @@ const ConfigMessageTypes = ({ messageTypes = [], onChange }) => {
           placeholder="e.g. Project Inquiry"
           className="col-span-full"
         />
-        <Input
-          label="Color"
-          type="color"
-          value={newMessageType.typeColor || "#ffffff"}
-          onChange={(e) =>
-            setNewMessageType({
-              ...newMessageType,
-              typeColor: e.target.value,
-            })
-          }
-          className="col-span-3"
-        />
+        <div className="col-span-3 space-y-2">
+          <label className="text-sm font-medium text-muted-foreground">
+            Color
+          </label>
+          <div className="flex gap-2">
+            <ColorPicker
+              value={newMessageType.typeColor || "#ffffff"}
+              onChange={(value, hex) =>
+                setNewMessageType({
+                  ...newMessageType,
+                  typeColor: hex,
+                })
+              }
+              showText
+              className="w-full p-2! flex! items-center! justify-center! bg-input!"
+            />
+          </div>
+        </div>
         <div className="flex items-end pb-0.5 col-span-1">
           <Button
             onClick={handleAddMessageType}
@@ -89,7 +96,7 @@ const ConfigMessageTypes = ({ messageTypes = [], onChange }) => {
         {messageTypes.map((t, index) => (
           <div
             key={index}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-full text-sm text-white border border-zinc-700"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-full text-sm text-foreground border border-border"
             style={{ backgroundColor: t.typeColor || "#27272a" }}
           >
             <span>{t.type}</span>
@@ -103,12 +110,12 @@ const ConfigMessageTypes = ({ messageTypes = [], onChange }) => {
           </div>
         ))}
         {messageTypes.length === 0 && (
-          <p className="text-zinc-500 text-sm italic">
+          <p className="text-muted-foreground text-sm italic">
             No message types added.
           </p>
         )}
       </div>
-    </div>
+    </Card>
   );
 };
 

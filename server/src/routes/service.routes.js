@@ -18,8 +18,8 @@ const router = Router();
 
 router.route("/").get(getAllServices).post(createService);
 router.route("/plans").get(getAllPlans).post(createPlan);
-router.route("/plans/:id").get(getPlanById).patch(updatePlan).delete(deletePlan);
+router.route("/plans/:id").get(getPlanById).put(updatePlan).delete(deletePlan);
 
-router.route("/:id").get(getServiceById).patch(updateService).delete(deleteService);
+router.route("/:id").get(getServiceById).put(updateService).delete(deleteService);
 
 export default router;

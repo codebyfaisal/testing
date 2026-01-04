@@ -1,18 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { Button } from "./Button";
-import usePortfolioStore from "../store/usePortfolioStore";
-import { cn } from "../utils/cn";
+import { Button } from "@/components";
+import usePortfolioStore from "@/store/usePortfolioStore";
+import { cn } from "@/utils/cn";
 
 const PrivacyBanner = () => {
   const [show, setShow] = useState(false);
-  const { isRounded } = usePortfolioStore();
+  const { rounded } = usePortfolioStore();
 
   useEffect(() => {
-    // Keeping the same key for backward compatibility or changing it?
-    // Let's keep "cookie_consent_acknowledged" so users who already accepted don't see it again.
     const consent = localStorage.getItem("cookie_consent_acknowledged");
     if (!consent) {
-      // Small delay for animation effect
       const timer = setTimeout(() => setShow(true), 1000);
       return () => clearTimeout(timer);
     }
@@ -29,11 +26,11 @@ const PrivacyBanner = () => {
     <div className="fixed bottom-0 left-0 right-0 z-50 p-4 animate-fade-in-up bg-transparent">
       <div
         className={cn(
-          "max-w-4xl mx-auto bg-black/70 backdrop-blur-md border border-white/10 p-6 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4 overflow-hidden",
-          isRounded ? "rounded-xl" : ""
+          "max-w-4xl mx-auto bg-card backdrop-blur-md border border-border p-6 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4 overflow-hidden",
+          rounded
         )}
       >
-        <div className="text-sm text-text-secondary text-center sm:text-left">
+        <div className="text-sm text-muted-foreground text-center sm:text-left">
           <p>
             We use cookies to analyze traffic and improve your experience. By
             continuing to use this site, you agree to our use of cookies.

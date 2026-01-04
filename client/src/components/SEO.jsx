@@ -1,5 +1,7 @@
 import React from "react";
-import { seoConfig } from "../config/seoConfig";
+import { useLocation } from "react-router-dom";
+import { siteConfig } from "@/config/siteConfig";
+import { seoConfig } from "@/config/seoConfig";
 
 const SEO = ({
   title,
@@ -9,15 +11,10 @@ const SEO = ({
   author,
   twitterHandle,
 }) => {
-  // Hierarchy Logic
-
-  // 1. Site Title (Base)
+  // 1. Site Title
   const siteTitle = seoConfig.siteTitle;
 
-  // 2. Page Title (Displayed in Tab)
-  // If title prop exists, use template: "Page | Site"
-  // If not, use siteTitle default.
-  // We can also allow a full override if needed, but standard template is good.
+  // 2. Page Title
   const pageTitle = title
     ? seoConfig.titleTemplate.replace("%s", title)
     : siteTitle;
@@ -44,8 +41,6 @@ const SEO = ({
   // 9. Robots
   const metaRobots = "index, follow";
 
-  // React 19 Native Metadata
-  // The tags below will be automatically hoisted to the <head>
   return (
     <>
       <title>{pageTitle}</title>

@@ -6,12 +6,10 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import useDashboardStore from "./store/useDashboardStore";
-import Layout from "./Layout";
+import useDashboardStore from "@/store/useDashboardStore";
 import {
   Overview,
   User,
-  Visitors,
   Services,
   Projects,
   Testimonials,
@@ -21,9 +19,14 @@ import {
   Register,
   FileManager,
   Plans,
-} from "./pages";
-import { ErrorBoundary, LogoPulse } from "./components";
-
+  Blogs,
+  Visitors,
+  Jobs,
+  JobApplications,
+  Subscribers,
+  Forms,
+} from "@/pages";
+import { Layout, ErrorBoundary, LogoPulse } from "@/components";
 import { Toaster } from "react-hot-toast";
 
 const AuthGuard = ({ children }) => {
@@ -44,6 +47,8 @@ const PublicGuard = ({ children, requireAdminCheck = false }) => {
   return children;
 };
 
+import { ThemeProvider } from "@/context/ThemeContext";
+
 function App() {
   const { checkAdminStatus, getUser, user } = useDashboardStore();
   const [isReady, setIsReady] = useState(false);
@@ -58,9 +63,7 @@ function App() {
     init();
   }, []);
 
-  useEffect(() => {
-    console.log(user);
-  }, [user]);
+  useEffect(() => {}, [user]);
 
   const router = useMemo(() => {
     return createBrowserRouter(
@@ -144,6 +147,22 @@ function App() {
               }
             />
             <Route
+              path="jobs"
+              element={
+                <ErrorBoundary>
+                  <Jobs />
+                </ErrorBoundary>
+              }
+            />
+            <Route
+              path="applications"
+              element={
+                <ErrorBoundary>
+                  <JobApplications />
+                </ErrorBoundary>
+              }
+            />
+            <Route
               path="testimonials"
               element={
                 <ErrorBoundary>
@@ -184,6 +203,30 @@ function App() {
                 </ErrorBoundary>
               }
             />
+            <Route
+              path="blogs"
+              element={
+                <ErrorBoundary>
+                  <Blogs />
+                </ErrorBoundary>
+              }
+            />
+            <Route
+              path="subscribers"
+              element={
+                <ErrorBoundary>
+                  <Subscribers />
+                </ErrorBoundary>
+              }
+            />
+            <Route
+              path="forms"
+              element={
+                <ErrorBoundary>
+                  <Forms />
+                </ErrorBoundary>
+              }
+            />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </>
@@ -193,30 +236,24 @@ function App() {
 
   if (!isReady)
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <LogoPulse />
       </div>
     );
 
   return (
-    <>
+    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
       <Toaster
         position="top-right"
         toastOptions={{
-          style: {
-            background: "#18181b",
-            color: "#fff",
-            border: "1px solid #27272a",
-          },
+          className: "!bg-card !text-foreground !border !border-border",
           error: {
-            style: {
-              border: "1px solid #ef4444",
-            },
+            className: "!border-destructive",
           },
         }}
       />
       <RouterProvider router={router} />
-    </>
+    </ThemeProvider>
   );
 }
 

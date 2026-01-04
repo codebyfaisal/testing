@@ -11,6 +11,6 @@ const router = Router();
 
 router.route("/").get(getAllMessages).post(createMessage);
 router.route("/:id").get(getMessageById).delete(deleteMessage);
-router.route("/:id/read").patch(markMessageAsRead);
+router.route("/:id/read").put(markMessageAsRead);
 
 export default router;

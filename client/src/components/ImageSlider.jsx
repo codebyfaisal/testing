@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "motion/react";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
-import { cn } from "../utils/cn";
+import { FaChevronLeft, FaChevronRight, FaExpand } from "react-icons/fa";
+import { cn } from "@/utils/cn";
+import { ServiceIllustration } from "./universe/previews/Illustrations";
 
-const ImageSlider = ({ images, title, isRounded }) => {
+const ImageSlider = ({ images = [], title, rounded }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(0);
 
@@ -16,36 +16,31 @@ const ImageSlider = ({ images, title, isRounded }) => {
     return () => clearInterval(interval);
   }, [currentIndex, images]);
 
-  if (!images || images.length === 0) return null;
-
-  // Single image view
-  if (images.length === 1) {
+  // No images: Show Illustration
+  if (!images || images.length === 0) {
     return (
-      <img src={images[0]} alt={title} className="w-full h-full object-cover" />
+      <figure className="relative w-full h-full overflow-hidden group m-0">
+        <ServiceIllustration />
+        {title && <figcaption className="sr-only">{title}</figcaption>}
+      </figure>
     );
   }
 
-  const slideVariants = {
-    enter: (direction) => ({
-      x: direction > 0 ? 1000 : -1000,
-      opacity: 0,
-    }),
-    center: {
-      zIndex: 1,
-      x: 0,
-      opacity: 1,
-    },
-    exit: (direction) => ({
-      zIndex: 0,
-      x: direction < 0 ? 1000 : -1000,
-      opacity: 0,
-    }),
-  };
+  // Single image view: No controls
+  if (images.length === 1) {
+    return (
+      <figure className="relative w-full h-full overflow-hidden group m-0">
+        <img
+          src={images[0]}
+          alt={title}
+          className="w-full h-full object-cover"
+        />
 
-  const swipeConfidenceThreshold = 10000;
-  const swipePower = (offset, velocity) => {
-    return Math.abs(offset) * velocity;
-  };
+        <div className="absolute inset-0 bg-linear-to-t from-black via-black/50 to-transparent pointer-events-none w-full h-full" />
+        {title && <figcaption className="sr-only">{title}</figcaption>}
+      </figure>
+    );
+  }
 
   const paginate = (newDirection) => {
     setDirection(newDirection);
@@ -62,38 +57,19 @@ const ImageSlider = ({ images, title, isRounded }) => {
 
   return (
     <figure className="relative w-full h-full overflow-hidden group m-0">
-      <AnimatePresence initial={false} custom={direction}>
-        <motion.img
-          key={currentIndex}
-          src={images[currentIndex]}
-          alt={`${title} - Slide ${currentIndex + 1}`}
-          custom={direction}
-          variants={slideVariants}
-          initial="enter"
-          animate="center"
-          exit="exit"
-          transition={{
-            x: { type: "spring", stiffness: 300, damping: 30 },
-            opacity: { duration: 0.2 },
-          }}
-          drag="x"
-          dragConstraints={{ left: 0, right: 0 }}
-          dragElastic={1}
-          onDragEnd={(e, { offset, velocity }) => {
-            const swipe = swipePower(offset.x, velocity.x);
-            if (swipe < -swipeConfidenceThreshold) {
-              nextSlide();
-            } else if (swipe > swipeConfidenceThreshold) {
-              prevSlide();
-            }
-          }}
-          className="absolute w-full h-full object-cover"
-        />
-      </AnimatePresence>
-
+      <img
+        key={currentIndex}
+        src={images[currentIndex]}
+        alt={`${title} - Slide ${currentIndex + 1}`}
+        className="absolute w-full h-full object-cover"
+      />
+      <div className="absolute inset-0 bg-linear-to-t from-black via-black/50 to-transparent pointer-events-none w-full h-full" />
       {/* Navigation Arrows */}
       <button
-        className="absolute top-1/2 left-4 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-3 rounded-full opacity-0 group-hover:opacity-100 transition-all z-10 backdrop-blur-sm"
+        className={cn(
+          "absolute top-1/2 left-4 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-3 opacity-0 group-hover:opacity-100 transition-all z-10 backdrop-blur-sm",
+          rounded
+        )}
         onClick={(e) => {
           e.stopPropagation();
           prevSlide();
@@ -102,7 +78,10 @@ const ImageSlider = ({ images, title, isRounded }) => {
         <FaChevronLeft />
       </button>
       <button
-        className="absolute top-1/2 right-4 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-3 rounded-full opacity-0 group-hover:opacity-100 transition-all z-10 backdrop-blur-sm"
+        className={cn(
+          "absolute top-1/2 right-4 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-3 opacity-0 group-hover:opacity-100 transition-all z-10 backdrop-blur-sm",
+          rounded
+        )}
         onClick={(e) => {
           e.stopPropagation();
           nextSlide();
@@ -110,7 +89,6 @@ const ImageSlider = ({ images, title, isRounded }) => {
       >
         <FaChevronRight />
       </button>
-
       {/* Dots */}
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
         {images.map((_, idx) => (
@@ -121,17 +99,15 @@ const ImageSlider = ({ images, title, isRounded }) => {
               setCurrentIndex(idx);
             }}
             className={cn(
-              "w-2.5 h-2.5 rounded-full transition-all backdrop-blur-sm",
+              "w-2.5 h-2.5 transition-all backdrop-blur-sm",
+              rounded,
               idx === currentIndex
-                ? "bg-white w-6"
-                : "bg-white/50 hover:bg-white/80"
+                ? "bg-primary w-6"
+                : "bg-primary/50 hover:bg-primary/80"
             )}
           />
         ))}
       </div>
-
-      {/* Overlay Gradient (Optional, similar to original) */}
-      <div className="absolute inset-0 bg-linear-to-t from-black via-black/50 to-transparent pointer-events-none" />
       {title && <figcaption className="sr-only">{title}</figcaption>}
     </figure>
   );

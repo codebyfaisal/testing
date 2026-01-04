@@ -1,92 +1,81 @@
 import React from "react";
-import { motion } from "motion/react";
-import usePortfolioStore from "../store/usePortfolioStore";
-import { FaCode } from "react-icons/fa";
-import { PageHeader, Plans, RenderIcon, SEO, Button } from "../components";
-import { cn } from "../utils/cn";
-import NotFound from "./NotFound";
 
-import { Skeleton } from "../components/Skeleton";
-import { siteConfig } from "../config/siteConfig";
+import usePortfolioStore from "@/store/usePortfolioStore";
+import { FaCode } from "react-icons/fa";
+import {
+  Skeleton,
+  NotFound,
+  PageHeader,
+  Plans,
+  RenderIcon,
+  SEO,
+  Button,
+} from "@/components";
+import { cn } from "@/utils/cn";
+import { siteConfig } from "@/config/siteConfig";
+
+const SkeletonLoader = () => (
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12">
+    {[1, 2, 3, 4, 5, 6].map((i) => (
+      <Skeleton key={i} className="h-[400px] w-full" />
+    ))}
+  </div>
+);
 
 const Services = () => {
-  const { data, isRounded, loading } = usePortfolioStore();
+  const { data, rounded, loading } = usePortfolioStore();
   const servicesData = data?.services || [];
   const plans = data?.plans || [];
   const servicesConfig = siteConfig?.pages?.services;
-
-  if (loading) {
-    return (
-      <div className="min-h-screen pt-5 overflow-hidden pb-20">
-        <div className="px-4 sm:px-6 lg:px-8 xl:px-0 md:max-w-7xl mx-auto">
-          <PageHeader
-            title={servicesConfig?.header?.title}
-            description={servicesConfig?.header?.loadingDesc}
-          />
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12">
-            {[1, 2, 3].map((i) => (
-              <Skeleton key={i} className="h-[400px] w-full rounded-3xl" />
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (!data) return null;
+  const headerConfig = servicesConfig?.header;
 
   return (
-    <div className="min-h-screen pt-5 overflow-hidden pb-20">
+    <>
       <SEO
-        title="Services"
-        description="Comprehensive professional services designed to meet your diverse needs. Web development, UI/UX design, and consultation."
-        keywords={[
-          "Services",
-          "Web Development",
-          "UI/UX",
-          "Consultation",
-          "Muhammad Faisal",
-        ]}
+        title={servicesConfig?.seo?.title}
+        description={servicesConfig?.seo?.description}
+        keywords={servicesConfig?.seo?.keywords}
       />
-      <div className="px-4 sm:px-6 lg:px-8 xl:px-0 md:max-w-7xl mx-auto">
-        <PageHeader
-          title={servicesConfig?.header?.title}
-          description={servicesConfig?.header?.description}
-        />
 
-        {servicesData.length === 0 ? (
-          <NotFound
-            title="No Services Found"
-            description="We are currently updating our service offerings. Please feel free to contact us for specific inquiries."
-            isFullPage={false}
-            backgroundText="EMPTY"
-            link="/contact"
-            backTo="Contact Me"
-            showBackgroundBubbles={false}
-            className="my-10"
+      {loading ? (
+        <SkeletonLoader />
+      ) : !servicesData || servicesData.length === 0 ? (
+        <NotFound
+          title="No Services Found"
+          description={headerConfig?.notFoundDesc}
+          backgroundText="EMPTY"
+          link="/contact"
+          backTo="Contact Me"
+          showBackgroundBubbles={false}
+          className="my-10"
+          rounded={rounded}
+        />
+      ) : (
+        <>
+          <PageHeader
+            title={headerConfig?.title}
+            description={headerConfig?.description}
+            className="text-center"
           />
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12">
+
+          <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
             {servicesData.map((service, index) => {
               return (
-                <motion.div
+                <div
                   key={service._id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className={cn("relative group", isRounded && "rounded-3xl")}
+                  className={cn("relative group", rounded)}
                 >
                   <div
                     className={cn(
-                      "relative h-full bg-[#1a1a1a] p-8 flex flex-col items-center text-center transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl border border-white/10 group-hover:border-white/20 shadow-blue/20",
-                      isRounded && "rounded-3xl"
+                      "relative h-full bg-card p-8 flex flex-col items-center text-center transition-all! duration-300! border border-border group-hover:border-secondary/20 group-hover:shadow-secondary/5 group-hover:shadow-2xl",
+                      rounded
                     )}
                   >
                     {/* Icon Box */}
                     <div
                       className={cn(
-                        "w-20 h-20 mb-6 flex items-center justify-center border-2 transition-transform duration-500 group-hover:rotate-6 bg-blue text-white",
-                        isRounded && "rounded-3xl"
+                        "w-20 h-20 mb-6 flex items-center justify-center border-2 border-primary/20 transition-transform duration-500 group-hover:rotate-6 bg-primary/10 text-primary",
+                        rounded
                       )}
                     >
                       {!service.icon || service.icon === "" ? (
@@ -97,12 +86,12 @@ const Services = () => {
                     </div>
 
                     {/* Title */}
-                    <h3 className="text-2xl font-bold text-white mb-4">
+                    <h3 className="text-2xl font-bold text-foreground mb-4 transition-colors duration-300">
                       {service.title}
                     </h3>
 
                     {/* Description */}
-                    <p className="text-neutral-400 mb-8 text-sm leading-relaxed">
+                    <p className="text-muted-foreground mb-8 text-sm leading-relaxed transition-colors duration-300">
                       {service.description}
                     </p>
 
@@ -115,16 +104,15 @@ const Services = () => {
                       {servicesConfig?.button}
                     </Button>
                   </div>
-                </motion.div>
+                </div>
               );
             })}
-          </div>
-        )}
-
-        {/* Web Development Plans Section */}
-        {<Plans plans={plans} />}
-      </div>
-    </div>
+          </section>
+          {/* Web Development Plans Section */}
+          {<Plans plans={plans} />}
+        </>
+      )}
+    </>
   );
 };
 

@@ -1,19 +1,48 @@
 import React, { useState } from "react";
-import { PageHeader, SEO, Button, SocialIcon } from "../components";
-import { cn } from "../utils/cn";
-import { motion } from "motion/react";
-import usePortfolioStore from "../store/usePortfolioStore";
-import portfolioService from "../api/portfolio.service";
-import toast from "react-hot-toast";
+import {
+  PageHeader,
+  SEO,
+  Button,
+  SocialIcons,
+  Skeleton,
+  Input,
+  Select,
+  Textarea,
+} from "@/components";
+import { cn } from "@/utils/cn";
+import usePortfolioStore from "@/store/usePortfolioStore";
+import portfolioService from "@/api/portfolio.service";
+import { toast } from "react-hot-toast";
 import {
   FaEnvelope,
   FaPhone,
   FaMapMarkerAlt,
   FaPaperPlane,
 } from "react-icons/fa";
+import { siteConfig } from "@/config/siteConfig";
 
-import { Skeleton } from "../components/Skeleton";
-import { siteConfig } from "../config/siteConfig";
+const SkeletonLoader = () => (
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+    <div className="space-y-8">
+      {[1, 2, 3, 4].map((i) => (
+        <div key={i} className="flex items-center gap-4">
+          <Skeleton className="w-12 h-12" />
+          <div className="space-y-2">
+            <Skeleton className="h-5 w-24" />
+            <Skeleton className="h-4 w-48" />
+          </div>
+        </div>
+      ))}
+    </div>
+    <div className="p-8 border border-border space-y-6">
+      <Skeleton className="h-10 w-full" />
+      <Skeleton className="h-10 w-full" />
+      <Skeleton className="h-10 w-full" />
+      <Skeleton className="h-32 w-full" />
+      <Skeleton className="h-12 w-full" />
+    </div>
+  </div>
+);
 
 const initialState = {
   name: "",
@@ -30,7 +59,7 @@ const Contact = () => {
     info,
     connect,
   } = siteConfig?.pages?.contact;
-  const { config, user, isRounded, loading } = usePortfolioStore();
+  const { config, user, rounded, loading } = usePortfolioStore();
   const messageTypes = config?.messageTypes || ["General", "Job", "Other"];
 
   const [formData, setFormData] = useState(initialState);
@@ -70,236 +99,170 @@ const Contact = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen pt-5 overflow-hidden pb-20">
-        <div className="px-4 sm:px-6 lg:px-8 xl:px-0 md:max-w-7xl mx-auto">
-          <PageHeader
-            title={{ ...header?.title }}
-            description={header?.loadingDesc}
-          />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-            <div className="space-y-8">
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="flex items-center gap-4">
-                  <Skeleton className="w-12 h-12 rounded-lg" />
-                  <div className="space-y-2">
-                    <Skeleton className="h-5 w-24" />
-                    <Skeleton className="h-4 w-48" />
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="p-8 border border-white/10 rounded-2xl space-y-6">
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-32 w-full" />
-              <Skeleton className="h-12 w-full rounded-lg" />
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   if (!config || !user) return null;
 
   return (
-    <div className="min-h-screen pt-5 overflow-hidden pb-20">
+    <>
       <SEO
         title={seo?.title}
         description={seo?.description}
         keywords={seo?.keywords}
       />
-      <div className="px-4 sm:px-6 lg:px-8 xl:px-0 md:max-w-7xl mx-auto">
-        <PageHeader
-          title={{ ...header?.title }}
-          description={header?.description}
-        />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+      <PageHeader
+        title={header?.title}
+        description={header?.description}
+        className="text-center"
+      />
+
+      {loading ? (
+        <SkeletonLoader />
+      ) : (
+        <section className="grid grid-cols-1 md:grid-cols-5 gap-12">
           {/* Contact Info */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.2 }}
-            className="space-y-8"
-          >
+          <div className="space-y-8 md:col-span-2">
             <div className="flex items-start gap-4">
               <div
                 className={cn(
                   "w-12 h-12 bg-secondary/10 flex items-center justify-center text-secondary text-xl shrink-0",
-                  isRounded ? "rounded-full" : ""
+                  rounded
                 )}
               >
                 <FaEnvelope />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-white mb-1">
+                <h3 className="text-lg font-bold text-foreground mb-1 transition-colors duration-300">
                   {info?.email}
                 </h3>
-                <p className="text-text-secondary">{user.email}</p>
+                <p className="text-muted-foreground transition-colors duration-300">
+                  {user.email}
+                </p>
               </div>
             </div>
             <div className="flex items-start gap-4">
               <div
                 className={cn(
                   "w-12 h-12 bg-secondary/10 flex items-center justify-center text-secondary text-xl shrink-0",
-                  isRounded && "rounded-full"
+                  rounded
                 )}
               >
                 <FaPhone />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-white mb-1">
+                <h3 className="text-lg font-bold text-foreground mb-1 transition-colors duration-300">
                   {info?.phone}
                 </h3>
-                <p className="text-text-secondary">{user.phone}</p>
+                <p className="text-muted-foreground transition-colors duration-300">
+                  {user.phone}
+                </p>
               </div>
             </div>
             <div className="flex items-start gap-4">
               <div
                 className={cn(
                   "w-12 h-12 bg-secondary/10 flex items-center justify-center text-secondary text-xl shrink-0",
-                  isRounded && "rounded-full"
+                  rounded
                 )}
               >
                 <FaMapMarkerAlt />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-white mb-1">
+                <h3 className="text-lg font-bold text-foreground mb-1 transition-colors duration-300">
                   {info?.location}
                 </h3>
-                <p className="text-text-secondary">{user.location}</p>
+                <p className="text-muted-foreground transition-colors duration-300">
+                  {user.location}
+                </p>
               </div>
             </div>
 
-            <div className="pt-8 border-t border-white/10">
-              <h3 className="text-lg font-bold text-white mb-4">{connect}</h3>
+            <div className="pt-8 border-t border-border">
+              <h3 className="text-lg font-bold text-foreground mb-4 transition-colors duration-300">
+                {connect}
+              </h3>
               <div className="flex gap-4">
                 {user?.socialLinks &&
                   Object.entries(user?.socialLinks || {}).map(
                     ([social, url]) => (
-                      <SocialIcon key={social} social={social} url={url} />
+                      <SocialIcons key={social} social={social} url={url} />
                     )
                   )}
               </div>
             </div>
-          </motion.div>
+          </div>
 
           {/* Contact Form */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.4 }}
+          <div
             className={cn(
-              "bg-black p-8 border border-white/10 rounded-2xl",
-              isRounded && "rounded-2xl"
+              "bg-card/80 backdrop-blur-3xl p-8 border border-border transition-colors duration-300 md:col-span-3",
+              rounded
             )}
           >
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <label
-                  htmlFor="name"
-                  className="block text-sm font-medium text-text-secondary mb-2"
-                >
-                  {formConfig?.labels?.name}{" "}
-                  <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  id="name"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  required
-                  className={cn(
-                    "w-full px-4 py-3 bg-black/70 border border-white/10 text-white focus:border-secondary focus:outline-none transition",
-                    isRounded && "rounded-lg"
-                  )}
-                  placeholder={formConfig?.placeholders.name}
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="email"
-                  className="block text-sm font-medium text-text-secondary mb-2"
-                >
-                  {formConfig?.labels?.email}{" "}
-                  <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                  className={cn(
-                    "w-full px-4 py-3 bg-black/70 border border-white/10 text-white focus:border-secondary focus:outline-none transition",
-                    isRounded && "rounded-lg"
-                  )}
-                  placeholder={formConfig?.placeholders.email}
-                />
-              </div>
+              <Input
+                type="text"
+                id="name"
+                name="name"
+                label={
+                  <span>
+                    {formConfig?.labels?.name}{" "}
+                    <span className="text-red-500">*</span>
+                  </span>
+                }
+                value={formData.name}
+                onChange={handleChange}
+                required
+                placeholder={formConfig?.placeholders.name}
+              />
+              <Input
+                type="email"
+                id="email"
+                name="email"
+                label={
+                  <span>
+                    {formConfig?.labels?.email}{" "}
+                    <span className="text-red-500">*</span>
+                  </span>
+                }
+                value={formData.email}
+                onChange={handleChange}
+                required
+                placeholder={formConfig?.placeholders.email}
+              />
 
               {messageTypes.length > 0 && (
-                <div>
-                  <label
-                    htmlFor="type"
-                    className="block text-sm font-medium text-text-secondary mb-2"
-                  >
-                    {formConfig?.labels?.topic}
-                  </label>
-                  <select
-                    id="type"
-                    name="type"
-                    value={formData.type}
-                    onChange={handleChange}
-                    className={cn(
-                      "w-full px-4 py-3 bg-black/70 border border-white/10 text-white focus:border-secondary focus:outline-none transition appearance-none capitalize",
-                      isRounded && "rounded-lg"
-                    )}
-                  >
-                    <option value="" className="bg-black text-secondary">
-                      {formConfig?.placeholders.topic}
-                    </option>
-                    {messageTypes.map((item, index) => (
-                      <option
-                        key={index}
-                        value={typeof item === "string" ? item : item.type}
-                        className="bg-black"
-                      >
-                        {typeof item === "string" ? item : item.type}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <Select
+                  id="type"
+                  name="type"
+                  label={formConfig?.labels?.topic}
+                  value={formData.type}
+                  onChange={handleChange}
+                  options={[
+                    {
+                      type: formConfig?.placeholders.topic,
+                      disabled: true,
+                      selected: true,
+                    },
+                    ...messageTypes,
+                  ]}
+                />
               )}
 
-              <div>
-                <label
-                  htmlFor="message"
-                  className="block text-sm font-medium text-text-secondary mb-2"
-                >
-                  {formConfig?.labels?.message}
-                  <span className="text-red-500">*</span>
-                </label>
-                <textarea
-                  id="message"
-                  name="message"
-                  value={formData.message}
-                  onChange={handleChange}
-                  required
-                  rows="4"
-                  className={cn(
-                    "w-full px-4 py-3 bg-black/70 border border-white/10 text-white focus:border-secondary focus:outline-none transition",
-                    isRounded && "rounded-lg"
-                  )}
-                  placeholder={formConfig?.placeholders.message}
-                ></textarea>
-              </div>
+              <Textarea
+                id="message"
+                name="message"
+                label={
+                  <span>
+                    {formConfig?.labels?.message}{" "}
+                    <span className="text-red-500">*</span>
+                  </span>
+                }
+                value={formData.message}
+                onChange={handleChange}
+                required
+                rows="4"
+                placeholder={formConfig?.placeholders.message}
+              ></Textarea>
               <Button
                 type="submit"
                 variant="primary"
@@ -315,10 +278,10 @@ const Contact = () => {
                 )}
               </Button>
             </form>
-          </motion.div>
-        </div>
-      </div>
-    </div>
+          </div>
+        </section>
+      )}
+    </>
   );
 };
 

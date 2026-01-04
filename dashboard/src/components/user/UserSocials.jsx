@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { motion } from "motion/react";
 import {
   FaGlobe,
   FaGithub,
@@ -14,7 +13,8 @@ import {
   FaPlus,
   FaTrash,
 } from "react-icons/fa";
-import { Input, Button, Select } from "../../components";
+import { Input, Button, Select, Card } from "@/components";
+import { cn } from "@/utils/cn";
 
 const socialPlatforms = [
   {
@@ -79,7 +79,7 @@ const socialPlatforms = [
   },
 ];
 
-const UserSocials = ({ formData, setFormData }) => {
+const UserSocials = ({ formData, setFormData, noOfSocials }) => {
   const [newSocialLink, setNewSocialLink] = useState({ platform: "", url: "" });
 
   const handleAddSocialLink = () => {
@@ -102,22 +102,19 @@ const UserSocials = ({ formData, setFormData }) => {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.4 }}
-      className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6"
-    >
-      <h3 className="text-lg font-bold text-white mb-6">Social Profiles</h3>
+    <Card>
+      <h3 className="text-lg font-bold text-foreground mb-6">
+        Social Profiles
+      </h3>
 
       {/* Add New Social Link */}
-      <div className="grid grid-cols-4 gap-4 mb-6 p-4 bg-zinc-950/50 rounded-xl border border-zinc-800/50">
+      <Card className="grid grid-cols-4 gap-4 mb-6 bg-muted/30" padding="p-4">
         <Select
           value={newSocialLink.platform}
-          onChange={(value) =>
+          onChange={(e) =>
             setNewSocialLink({
               ...newSocialLink,
-              platform: value,
+              platform: e.target.value,
             })
           }
           placeholder="Select Platform"
@@ -151,10 +148,15 @@ const UserSocials = ({ formData, setFormData }) => {
           }
           className="col-span-full"
         />
-      </div>
+      </Card>
 
       {/* List of Added Links */}
-      <div className="grid grid-cols-1 gap-4">
+      <div
+        className={cn(
+          "grid grid-cols-1 gap-4",
+          noOfSocials > 2 && "xs:grid-cols-2 xl:grid-cols-3"
+        )}
+      >
         {Object.entries(formData.socialLinks).map(([platform, url]) => {
           const platformInfo = socialPlatforms.find(
             (p) => p.value === platform
@@ -162,35 +164,40 @@ const UserSocials = ({ formData, setFormData }) => {
           if (!platformInfo) return null;
 
           return (
-            <div
+            <Card
               key={platform}
-              className="flex items-center gap-4 p-4 bg-zinc-950 border border-zinc-800 rounded-xl group"
+              className="flex items-center gap-4 p-4 bg-muted/40 border border-border rounded-xl group"
             >
-              <div className="w-10 h-10 rounded-lg bg-zinc-900 flex items-center justify-center text-indigo-500 text-xl border border-zinc-800">
+              <Card
+                className="w-10 h-10 flex items-center justify-center text-primary text-xl"
+                title={url}
+                rounded="rounded-lg"
+                padding="p-0"
+              >
                 {platformInfo.icon}
-              </div>
-              <div className="flex-1 min-w-0">
-                <h4 className="text-sm font-medium text-white capitalize">
+              </Card>
+              <div className="flex-1 min-w-0" title={url}>
+                <h4 className="text-sm font-medium text-foreground capitalize">
                   {platformInfo.name}
                 </h4>
-                <p className="text-xs text-zinc-500 truncate">{url}</p>
+                <p className="text-xs text-muted-foreground truncate">{url}</p>
               </div>
               <Button
                 onClick={() => handleRemoveSocialLink(platform)}
                 uiType="text"
-                className="p-2 text-zinc-500 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors opacity-0 group-hover:opacity-100 w-auto"
+                className="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors opacity-0 group-hover:opacity-100 w-auto"
                 icon={<FaTrash />}
               />
-            </div>
+            </Card>
           );
         })}
         {Object.keys(formData.socialLinks).length === 0 && (
-          <div className="text-center py-8 text-zinc-500 border-2 border-dashed border-zinc-800 rounded-xl">
+          <Card className="text-center py-8 text-muted-foreground border-2 border-dashed border-border rounded-xl">
             No social profiles added yet
-          </div>
+          </Card>
         )}
       </div>
-    </motion.div>
+    </Card>
   );
 };
 

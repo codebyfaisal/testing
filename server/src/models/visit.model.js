@@ -16,7 +16,7 @@ const visitSchema = new mongoose.Schema(
     createdAt: {
       type: Date,
       default: Date.now,
-      expires: "60d", // TTL index: Auto-delete after 2 months (60 days)
+      expires: "60d",
     },
     location: {
       country: String,
@@ -27,7 +27,6 @@ const visitSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// TTL Index: Auto-delete logs after 30 days (2592000 seconds)
 visitSchema.index({ createdAt: 1 }, { expireAfterSeconds: 2592000 });
 
 export const Visit = mongoose.model("Visit", visitSchema);

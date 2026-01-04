@@ -1,117 +1,15 @@
-import React, { useState, use, Suspense, useEffect } from "react";
-import useDashboardStore from "../store/useDashboardStore";
-import { motion } from "motion/react";
-import { FaEnvelope, FaEnvelopeOpen, FaTrash, FaEye } from "react-icons/fa";
+import React, { useState, Suspense } from "react";
+import useDashboardStore from "@/store/useDashboardStore";
+import { FaTrash } from "react-icons/fa";
 import {
-  Modal,
   Button,
-  NotFound,
   ConfirmationModal,
+  Modal,
+  PageHeader,
   MessageSkeleton,
-} from "../components";
+  MessageList,
+} from "@/components";
 import toast from "react-hot-toast";
-
-const MessageList = ({ onView, onDelete, onMarkRead }) => {
-  const { fetchMessages, data, getConfig } = useDashboardStore();
-  const messages = use(fetchMessages());
-  const config = data?.config;
-
-  useEffect(() => {
-    if (!config?.messageTypes) getConfig();
-  }, []);
-
-  if (!messages || messages.length === 0) {
-    return (
-      <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden p-8 flex justify-center">
-        <NotFound Icon={FaEnvelope} message="No messages found." />
-      </div>
-    );
-  }
-
-  return (
-    <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
-      <div className="overflow-x-auto">
-        <table className="w-full text-left">
-          <thead className="bg-zinc-950 text-zinc-400 uppercase text-xs font-semibold">
-            <tr>
-              <th className="px-6 py-4">Status</th>
-              <th className="px-6 py-4">Type</th>
-              <th className="px-6 py-4">From</th>
-              <th className="px-6 py-4">Subject</th>
-              <th className="px-6 py-4">Date</th>
-              <th className="px-6 py-4 text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-zinc-800">
-            {messages.map((message, index) => (
-              <motion.tr
-                key={message._id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.05 }}
-                className="hover:bg-zinc-800/50 transition-colors"
-              >
-                <td className="px-6 py-4">
-                  <span
-                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      message.status === "unread"
-                        ? "bg-indigo-500/10 text-indigo-400 border border-indigo-500/20"
-                        : "bg-zinc-500/10 text-zinc-400 border border-zinc-500/20"
-                    }`}
-                  >
-                    {message.status}
-                  </span>
-                </td>
-                <td className="px-6 py-4">
-                  <span
-                    className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-zinc-800 text-zinc-300 border border-zinc-700"
-                    style={{
-                      backgroundColor:
-                        config?.messageTypes?.find(
-                          (t) => t.type === message.type
-                        )?.typeColor || "#27272a",
-                    }}
-                  >
-                    {message?.type || "General"}
-                  </span>
-                </td>
-                <td className="px-6 py-4 font-medium text-white">
-                  {message.from}
-                </td>
-                <td className="px-6 py-4 text-zinc-300">{message.subject}</td>
-                <td className="px-6 py-4 text-zinc-400 text-sm">
-                  {new Date(message.date).toLocaleDateString()}
-                </td>
-                <td className="px-6 py-4 text-right flex justify-end gap-2">
-                  <Button
-                    onClick={() => onView(message)}
-                    uiType="text"
-                    icon={<FaEye size={12} />}
-                    label="View"
-                  />
-                  {message.status === "unread" && (
-                    <Button
-                      onClick={() => onMarkRead(message._id)}
-                      uiType="text"
-                      icon={<FaEnvelopeOpen size={12} />}
-                      label="Mark as Read"
-                    />
-                  )}
-                  <Button
-                    onClick={() => onDelete(message._id)}
-                    uiType="danger"
-                    icon={<FaTrash size={12} />}
-                    label="Delete"
-                  />
-                </td>
-              </motion.tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
-};
 
 const Messages = () => {
   const { markMessageRead, deleteMessage } = useDashboardStore();
@@ -120,7 +18,7 @@ const Messages = () => {
   const [selectedMessage, setSelectedMessage] = useState(null);
   const [confirmState, setConfirmState] = useState({
     isOpen: false,
-    type: null, // 'delete'
+    type: null,
     id: null,
   });
 
@@ -175,19 +73,21 @@ const Messages = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <header>
-        <h1 className="text-3xl font-bold">Messages</h1>
-        <p className="text-zinc-400">View and manage your incoming messages.</p>
-      </header>
+    <div className="h-[calc(100vh-2rem)] flex flex-col space-y-4">
+      <PageHeader
+        title="Messages"
+        description="View and manage your incoming messages."
+      />
 
-      <Suspense fallback={<MessageSkeleton />}>
-        <MessageList
-          onView={handleViewMessage}
-          onDelete={handleDelete}
-          onMarkRead={handleMarkRead}
-        />
-      </Suspense>
+      <div className="flex-1 overflow-y-auto min-h-0 pr-1">
+        <Suspense fallback={<MessageSkeleton />}>
+          <MessageList
+            onView={handleViewMessage}
+            onDelete={handleDelete}
+            onMarkRead={handleMarkRead}
+          />
+        </Suspense>
+      </div>
 
       <Modal
         isOpen={isModalOpen}
@@ -196,34 +96,34 @@ const Messages = () => {
       >
         {selectedMessage && (
           <div className="space-y-6">
-            <div className="flex justify-between items-start border-b border-zinc-800 pb-4">
+            <div className="flex justify-between items-start border-b border-border pb-4">
               <div className="space-y-1">
                 <p className="">
                   From:{" "}
-                  <span className="text-sm text-indigo-400 font-semibold">
+                  <span className="text-sm text-primary font-semibold">
                     {selectedMessage.from}
                   </span>
                 </p>
-                <p className="text-xs text-zinc-400">
+                <p className="text-xs text-muted-foreground">
                   Email: {selectedMessage.email}
                 </p>
-                <p className="text-xs text-zinc-400">
+                <p className="text-xs text-muted-foreground">
                   Type:{" "}
-                  <span className="text-zinc-300">
+                  <span className="text-foreground">
                     {selectedMessage.type || "General"}
                   </span>
                 </p>
               </div>
-              <span className="text-xs text-zinc-500">
+              <span className="text-xs text-muted-foreground">
                 {new Date(selectedMessage.date).toLocaleString()}
               </span>
             </div>
 
-            <div className="text-zinc-300 leading-relaxed whitespace-pre-wrap">
+            <div className="text-foreground leading-relaxed whitespace-pre-wrap">
               {selectedMessage.message || "No message content."}
             </div>
 
-            <div className="pt-4 flex justify-end gap-3 border-t border-zinc-800">
+            <div className="pt-4 flex justify-end gap-3 border-t border-border">
               <Button onClick={handleCloseModal} uiType="text" label="Close" />
               <Button
                 onClick={() => handleDelete(selectedMessage._id)}

@@ -27,11 +27,6 @@ export const siteConfig = {
             designedBy: "Designed & Built with",
         },
     },
-    cta: {
-        heading: "Ready to start your project?",
-        description: "Let's turn your ideas into reality. Book a consultation or view my plans below.",
-        primaryBtn: "Get Started",
-    },
     plans: {
         heading: "Plans for You",
         subHeading: "Choose the perfect plan for your needs.",
@@ -44,6 +39,13 @@ export const siteConfig = {
             contact: "Contact for Quote",
             start: "Get Started",
         },
+    },
+    testimonials: {
+        title: {
+            start: "What",
+            middle: "Clients Say",
+        },
+        description: "",
     },
 
     pages: {
@@ -146,45 +148,6 @@ export const siteConfig = {
                 skills: "No skills added.",
             },
         },
-        contact: {
-            header: {
-                title: {
-                    start: "Get",
-                    middle: "In Touch",
-                },
-                description: "Have a project in mind? Let's build something amazing together.",
-                loadingDesc: "Loading contact info...",
-            },
-            seo: {
-                title: "Contact",
-                description: "Get in touch to discuss your next project, job opportunity, or collaboration. Available for hire.",
-                keywords: ["Contact", "Hire Developer", "Collaboration", "Inquiry"],
-            },
-            form: {
-                labels: {
-                    name: "Name",
-                    email: "Email",
-                    topic: "Topic",
-                    message: "Message",
-                },
-                    placeholders: {
-                        name: "Your Name",
-                        email: "your@email.com",
-                        topic: "Select a topic...",
-                        message: "Tell me about your project...",
-                    },
-                submitBtn: {
-                    idle: "Send Message",
-                    sending: "Sending...",
-                }
-            },
-            info: {
-                email: "Email",
-                phone: "Phone",
-                location: "Location",
-            },
-            connect: "Connect with me",
-        },
         services: {
             header: {
                 title: {
@@ -244,6 +207,95 @@ export const siteConfig = {
                 live: "Live Demo",
                 details: "View Details",
             },
+        },
+        blogs: {
+            header: {
+                title: {
+                    start: "Blogs &",
+                    middle: "Articles"
+                },
+                description: "Read our latest articles and stay updated with the latest trends in the world of technology.",
+                loadingDesc: "Loading blogs...",
+            },
+            seo: {
+                title: "Blogs",
+                description: "Read our latest articles and stay updated with the latest trends in the world of technology.",
+                keywords: [
+                    "Blogs",
+                    "Portfolio",
+                    "Case Studies",
+                    "Web Apps",
+                    "React",
+                ],
+            },
+            notFound: {
+                title: "No Blogs Found",
+                description: "I'm currently working on some exciting new blogs. Check back soon!",
+                backTo: "Go Home"
+            },
+        },
+        careers: {
+            header: {
+                title: {
+                    start: "Join",
+                    middle: "Our Team",
+                },
+                description: "We're looking for passionate individuals to help us build the future. Check out our open positions below.",
+            },
+            seo: {
+                title: "Careers",
+                description: "We're looking for passionate individuals to help us build the future. Check out our open positions below.",
+                keywords: [
+                    "Careers",
+                    "Jobs",
+                    "Open Positions",
+                    "Hire",
+                ],
+            },
+            notFound: {
+                title: "No Openings Right Now",
+                description: "I don't have any open positions at the moment, but please check back later!",
+                backTo: "Go Home"
+            },
+        },
+        contact: {
+            header: {
+                title: {
+                    start: "Get",
+                    middle: "In Touch",
+                },
+                description: "Have a project in mind? Let's build something amazing together.",
+                loadingDesc: "Loading contact info...",
+            },
+            seo: {
+                title: "Contact",
+                description: "Get in touch to discuss your next project, job opportunity, or collaboration. Available for hire.",
+                keywords: ["Contact", "Hire Developer", "Collaboration", "Inquiry"],
+            },
+            form: {
+                labels: {
+                    name: "Name",
+                    email: "Email",
+                    topic: "Topic",
+                    message: "Message",
+                },
+                placeholders: {
+                    name: "Your Name",
+                    email: "your@email.com",
+                    topic: "Select a topic...",
+                    message: "Tell me about your project...",
+                },
+                submitBtn: {
+                    idle: "Send Message",
+                    sending: "Sending...",
+                }
+            },
+            info: {
+                email: "Email",
+                phone: "Phone",
+                location: "Location",
+            },
+            connect: "Connect with me",
         },
     },
 }

@@ -5,6 +5,7 @@ import { Message } from "../models/message.model.js";
 import { Plan } from "../models/plan.model.js";
 import { User } from "../models/user.model.js";
 import { Config } from "../models/config.model.js";
+import Post from "../models/post.model.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
@@ -15,6 +16,7 @@ const getOverviewStats = asyncHandler(async (req, res) => {
     const testimonialCount = await Testimonial.countDocuments();
     const messageCount = await Message.countDocuments();
     const planCount = await Plan.countDocuments();
+    const postCount = await Post.countDocuments();
 
     // 2. Fetch recent messages (e.g., last 5)
     const recentMessages = await Message.find()
@@ -89,7 +91,8 @@ const getOverviewStats = asyncHandler(async (req, res) => {
                     services: serviceCount,
                     testimonials: testimonialCount,
                     messages: messageCount,
-                    plans: planCount
+                    plans: planCount,
+                    posts: postCount
                 },
                 recentMessages,
                 health

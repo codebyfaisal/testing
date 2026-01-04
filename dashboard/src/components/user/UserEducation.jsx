@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { motion } from "motion/react";
+
 import { FaUser, FaPlus, FaTrash } from "react-icons/fa";
-import { Input, Button, Modal } from "../../components";
+import { Input, Button, Modal, Card } from "@/components";
 
 const UserEducation = ({ formData, setFormData }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -50,15 +50,10 @@ const UserEducation = ({ formData, setFormData }) => {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.28 }}
-      className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6"
-    >
+    <Card>
       <div className="flex justify-between items-center mb-6">
-        <h3 className="text-lg font-bold text-white flex items-center gap-2">
-          <FaUser className="text-indigo-500" /> Education
+        <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
+          <FaUser className="text-primary" /> Education
         </h3>
         <Button
           onClick={() => setIsModalOpen(true)}
@@ -66,6 +61,39 @@ const UserEducation = ({ formData, setFormData }) => {
           icon={<FaPlus size={12} />}
           label="Add Education"
         />
+      </div>
+
+      {/* List Education */}
+      <div className="space-y-4">
+        {formData.education.map((edu, index) => (
+          <Card
+            key={index}
+            className="bg-muted/30 relative group"
+            padding="p-4"
+          >
+            <Button
+              onClick={() => handleRemoveEducation(index)}
+              uiType="text"
+              icon={<FaTrash />}
+              className="absolute top-4 right-4 text-muted-foreground opacity-0 group-hover:opacity-100 w-auto group-hover:hover:text-destructive"
+            />
+            <h4 className="font-bold text-foreground">{edu.degree}</h4>
+            <p className="text-primary text-sm">
+              {edu.institution}, {edu.location}
+            </p>
+            <p className="text-muted-foreground text-xs mt-1">
+              {new Date(edu.startDate).toLocaleDateString()} -{" "}
+              {edu.current
+                ? "Present"
+                : new Date(edu.endDate).toLocaleDateString()}
+            </p>
+            {edu.description && (
+              <p className="text-muted-foreground text-sm mt-2">
+                {edu.description}
+              </p>
+            )}
+          </Card>
+        ))}
       </div>
 
       <Modal
@@ -140,14 +168,17 @@ const UserEducation = ({ formData, setFormData }) => {
                   current: e.target.checked,
                 })
               }
-              className="rounded border-zinc-800 bg-zinc-900 text-indigo-600 focus:ring-indigo-500"
+              className="rounded border-border bg-muted text-primary focus:ring-primary"
             />
-            <label htmlFor="currentEducation" className="text-sm text-zinc-400">
+            <label
+              htmlFor="currentEducation"
+              className="text-sm text-muted-foreground"
+            >
               I am currently studying here
             </label>
           </div>
           <div className="space-y-2">
-            <label className="text-sm font-medium text-zinc-300">
+            <label className="text-sm font-medium text-muted-foreground">
               Description
             </label>
             <textarea
@@ -159,7 +190,7 @@ const UserEducation = ({ formData, setFormData }) => {
                 })
               }
               rows={3}
-              className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-indigo-500 transition-colors resize-none placeholder-zinc-600"
+              className="w-full bg-input border border-border rounded-lg px-4 py-3 text-foreground focus:outline-none focus:border-primary transition-colors resize-none placeholder-muted-foreground"
             />
           </div>
           <div className="flex justify-end gap-2 pt-4">
@@ -176,37 +207,7 @@ const UserEducation = ({ formData, setFormData }) => {
           </div>
         </div>
       </Modal>
-
-      {/* List Education */}
-      <div className="space-y-4">
-        {formData.education.map((edu, index) => (
-          <div
-            key={index}
-            className="bg-zinc-950 border border-zinc-800 rounded-xl p-4 relative group"
-          >
-            <Button
-              onClick={() => handleRemoveEducation(index)}
-              uiType="text"
-              icon={<FaTrash />}
-              className="absolute top-4 right-4 text-zinc-500 opacity-0 group-hover:opacity-100 w-auto group-hover:hover:text-red-500"
-            />
-            <h4 className="font-bold text-white">{edu.degree}</h4>
-            <p className="text-indigo-400 text-sm">
-              {edu.institution}, {edu.location}
-            </p>
-            <p className="text-zinc-500 text-xs mt-1">
-              {new Date(edu.startDate).toLocaleDateString()} -{" "}
-              {edu.current
-                ? "Present"
-                : new Date(edu.endDate).toLocaleDateString()}
-            </p>
-            {edu.description && (
-              <p className="text-zinc-400 text-sm mt-2">{edu.description}</p>
-            )}
-          </div>
-        ))}
-      </div>
-    </motion.div>
+    </Card>
   );
 };
 
