@@ -21,9 +21,11 @@ const createMessage = asyncHandler(async (req, res) => {
 
 const getAllMessages = asyncHandler(async (req, res) => {
     const messages = await Message.find().sort({ date: -1 });
-    return res.status(200).json(
-        new ApiResponse(200, messages, "Messages fetched successfully")
-    );
+    setTimeout(() => {
+        return res.status(200).json(
+            new ApiResponse(200, messages, "Messages fetched successfully")
+        );
+    }, 6000);
 });
 
 const getMessageById = asyncHandler(async (req, res) => {

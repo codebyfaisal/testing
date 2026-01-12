@@ -92,7 +92,6 @@ const getApplications = asyncHandler(async (req, res) => {
         .populate("job", "title")
         .populate("form", "title")
         .populate("applicant", "name email resumeLink portfolioLink");
-
     return res.status(200).json(
         new ApiResponse(200, applications, "Applications fetched successfully")
     );
