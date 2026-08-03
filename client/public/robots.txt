@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://codebyfaisal.netlify.app/sitemap.xml
