@@ -1,7 +1,7 @@
 import axios from "axios";
 import usePortfolioStore from "../store/usePortfolioStore";
 
-export const BASE_API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000/api/v1";
+export const BASE_API_URL = import.meta.env.VITE_BASE_API_URL || "http://localhost:4000/api/v1";
 
 const api = axios.create({
     baseURL: BASE_API_URL,
