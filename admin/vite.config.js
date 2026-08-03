@@ -19,9 +19,13 @@ export default defineConfig({
     sourcemap: false, // Security: Disable production sourcemaps (BUG-020)
     rollupOptions: {
       output: {
-        manualChunks: {
-          vendor: ["react", "react-dom", "react-router-dom"],
-          ui: ["antd", "motion"],
+        manualChunks(id) {
+          if (id.includes('node_modules/react') || id.includes('node_modules/react-dom') || id.includes('node_modules/react-router-dom')) {
+            return 'vendor';
+          }
+          if (id.includes('node_modules/antd') || id.includes('node_modules/motion')) {
+            return 'ui';
+          }
         },
       },
     },
