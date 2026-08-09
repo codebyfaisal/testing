@@ -22,8 +22,7 @@ const logVisit = asyncHandler(async (req, res) => {
         const cookieDate = new Date(lastVisitCookie);
         if (!isNaN(cookieDate.getTime())) {
             if (lastCleanup && cookieDate < lastCleanup) {
-                // Expired by cleanup, fall through to re-log
-            } else {
+             } else {
                 const cookieDay = cookieDate.toISOString().split("T")[0];
                 if (cookieDay === today) {
                     return res.status(200).json(new ApiResponse(200, {}, "Visit already logged today"));

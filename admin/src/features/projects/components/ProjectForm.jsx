@@ -65,7 +65,6 @@ const ProjectForm = ({ isOpen, onClose, projectToEdit }) => {
         featured: projectToEdit.featured || false,
       };
     } else {
-      // Reset Logic
       initialData = {
         title: "",
         description: "",

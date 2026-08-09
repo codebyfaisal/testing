@@ -41,7 +41,7 @@ const Input = forwardRef(
           )}
           {...props}
         />
-        {/* Render explicitly passed error message or children (for flexibility) */}
+        {/* Error Message */}
         {error && typeof error === "string" && (
           <p className="text-xs text-red-500">{error}</p>
         )}

@@ -25,14 +25,12 @@ import { RightSidebar } from "@/components";
 import useDashboardStore from "@/store/useDashboardStore";
 
 const JobApplications = () => {
-  // State Selectors
   const applications = useDashboardStore((state) => state.applications);
   const isApplicationsLoading = useDashboardStore(
     (state) => state.isApplicationsLoading,
   );
   const jobs = useDashboardStore((state) => state.jobs);
 
-  // Actions
   const {
     fetchApplications,
     updateApplicationStatus,
@@ -46,16 +44,14 @@ const JobApplications = () => {
   const [showFilters, setShowFilters] = useState(false);
 
   const [searchParams, setSearchParams] = useSearchParams();
-  // Memoize initial ID to avoid re-creation
-  const initJobId = React.useMemo(() => searchParams.get("jobId") || "", []);
 
-  const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState(() => ({
     search: "",
-    jobId: initJobId,
+    jobId: searchParams.get("jobId") || "",
     status: "",
     from: "",
     to: "",
-  });
+  }));
 
   useEffect(() => {
     fetchJobs();
@@ -72,7 +68,6 @@ const JobApplications = () => {
     }
   }, [filters.jobId, searchParams, setSearchParams]);
 
-  // Client-Side Filtering
   const filteredApplications = React.useMemo(() => {
     if (!applications) return [];
 

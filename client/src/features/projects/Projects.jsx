@@ -41,7 +41,7 @@ const Projects = () => {
       } else {
         setProjectsData((prev) => [...prev, ...(projects || [])]);
       }
-      
+
       setHasMore(more);
     } catch (error) {
       console.error("Failed to fetch projects data:", error);
@@ -93,7 +93,7 @@ const Projects = () => {
       ) : (
         <div className="space-y-24">
           <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {projectsData.map((project, index) => (
+            {projectsData.map((project) => (
               <div
                 key={project._id}
                 className={cn(

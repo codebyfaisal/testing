@@ -19,7 +19,6 @@ const UserSkills = ({ formData, setFormData, className = "" }) => {
     if (!trimmedName) return;
 
     if (editingIndex !== null) {
-      // Update existing skill
       setFormData((prev) => {
         const updatedSkills = [...prev.skills];
         updatedSkills[editingIndex] = {
@@ -32,7 +31,6 @@ const UserSkills = ({ formData, setFormData, className = "" }) => {
       });
       setEditingIndex(null);
     } else {
-      // Add new skill (prevent duplicates)
       if (formData.skills.some((s) => s.name.toLowerCase() === trimmedName.toLowerCase())) {
         alert("A skill with this name already exists.");
         return;

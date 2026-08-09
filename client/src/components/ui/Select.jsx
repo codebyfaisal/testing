@@ -33,7 +33,6 @@ const Select = forwardRef(
       return { ...opt, label: lbl, value: val };
     });
 
-    // Handle clicking outside to close
     useEffect(() => {
       const handleClickOutside = (event) => {
         if (
@@ -48,7 +47,6 @@ const Select = forwardRef(
         document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
-    // Sync selected state if value prop changes (controlled mode)
     useEffect(() => {
       if (value !== undefined) setSelected(value);
     }, [value]);
@@ -57,7 +55,6 @@ const Select = forwardRef(
       setSelected(optionValue);
       setIsOpen(false);
 
-      // trigger native change event for react-hook-form
       if (innerSelectRef.current) {
         innerSelectRef.current.value = optionValue;
         const event = new Event("change", { bubbles: true });

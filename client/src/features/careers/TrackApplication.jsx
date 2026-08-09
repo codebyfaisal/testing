@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   FaSearch,
   FaCheckCircle,
@@ -129,12 +129,6 @@ const TrackApplication = () => {
   };
 
   const ApplicationDetailsModal = ({ app, onClose, rounded }) => {
-    // useEffect(() => {
-    //   document.body.style.overflow = "hidden";
-    //   return () => {
-    //     document.body.style.overflow = "unset";
-    //   };
-    // }, []);
 
     if (!app) return null;
     return (

@@ -88,7 +88,6 @@ const Visitors = () => {
     resetStatsState,
   } = useDashboardStore();
 
-  // Query State
   const [page, setPage] = useState(1);
   const [filters, setFilters] = useState({
     startDate: "",
@@ -105,13 +104,11 @@ const Visitors = () => {
     sortOrder: "desc",
   });
 
-  // UI State
   const [selected, setSelected] = useState([]);
   const [viewVisit, setViewVisit] = useState(null);
   const [showFilters, setShowFilters] = useState(false);
   const [showWipeModal, setShowWipeModal] = useState(false);
 
-  // Debounced fetch trigger
   const prevFiltersRef = useRef(filters);
 
   useEffect(() => {
@@ -136,7 +133,6 @@ const Visitors = () => {
     }
   }, [page, filters, sorting]);
 
-  // Initial Stats
   useEffect(() => {
     fetchVisitorStats();
     return () => resetStatsState();
@@ -145,7 +141,6 @@ const Visitors = () => {
   const visitsList = visits?.visits || [];
   const meta = visits?.meta || {};
 
-  // Handlers
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
     setFilters((prev) => ({ ...prev, [name]: value }));

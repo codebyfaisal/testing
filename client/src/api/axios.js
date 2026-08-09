@@ -6,7 +6,7 @@ export const BASE_API_URL = import.meta.env.VITE_BASE_API_URL || "http://localho
 const api = axios.create({
     baseURL: BASE_API_URL,
     withCredentials: true,
-    timeout: 10000, // 10 seconds timeout protection (CLIENT-001)
+    timeout: 10000, // 10 seconds timeout protection
 });
 
 api.interceptors.request.use(

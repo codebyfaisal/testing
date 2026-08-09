@@ -2,13 +2,12 @@ import servicesService from './services.service';
 import { getErrorMessage } from "@/store/utils";
 
 export const createServiceSlice = (set, get) => ({
-    services: null, // Top-level state
-    servicePromise: null, // Promise caching
+    services: null,
+    servicePromise: null,
 
     fetchServices: async () => {
         const { services, servicePromise } = get();
 
-        // If data exists, return resolved promise
         if (services !== null) {
             if (servicePromise) return servicePromise;
             const resolved = Promise.resolve(services);
@@ -16,12 +15,10 @@ export const createServiceSlice = (set, get) => ({
             return resolved;
         }
 
-        // If already fetching, return existing promise
         if (servicePromise) return servicePromise;
 
         set({ isLoading: true });
 
-        // Fetch
         try {
             const promise = servicesService.getServices().then((data) => {
                 const safeData = data || [];

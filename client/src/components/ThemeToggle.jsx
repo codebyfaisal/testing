@@ -21,7 +21,7 @@ const ThemeToggle = ({ className }) => {
       onClick={toggleTheme}
       type="button"
       className={cn(
-        "p-1.5 !bg-transparent hover:bg-black/5 dark:hover:bg-white/10 transition-colors duration-200 flex items-center justify-center cursor-pointer rounded-lg !border-0 !border-none outline-none !shadow-none",
+        "p-1.5 bg-transparent hover:bg-black/5 dark:hover:bg-white/10 transition-colors duration-200 flex items-center justify-center cursor-pointer rounded-lg border-0 outline-none shadow-none",
         className,
       )}
       title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}

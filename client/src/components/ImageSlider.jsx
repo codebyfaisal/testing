@@ -8,7 +8,6 @@ const ImageSlider = ({ images = [], title, rounded }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(0);
 
-  // Auto-play
   useEffect(() => {
     if (!images || images.length <= 1) return;
     const interval = setInterval(() => {
@@ -17,7 +16,6 @@ const ImageSlider = ({ images = [], title, rounded }) => {
     return () => clearInterval(interval);
   }, [images?.length]);
 
-  // No images: Show Illustration
   if (!images || images.length === 0) {
     return (
       <figure className="relative w-full h-full overflow-hidden group m-0">
@@ -27,7 +25,6 @@ const ImageSlider = ({ images = [], title, rounded }) => {
     );
   }
 
-  // Single image view: No controls
   if (images.length === 1) {
     return (
       <figure className="relative w-full h-full overflow-hidden group m-0">

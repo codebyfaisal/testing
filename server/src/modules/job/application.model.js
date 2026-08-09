@@ -37,7 +37,6 @@ const applicationSchema = new Schema(
     }
 );
 
-// Ensure at least one of job or form is present
 applicationSchema.pre("validate", async function () {
     if (!this.job && !this.form) {
         throw new Error("Application must be linked to either a Job or a Form");

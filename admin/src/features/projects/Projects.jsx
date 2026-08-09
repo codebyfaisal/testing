@@ -3,7 +3,6 @@ import { useSearchParams } from "react-router-dom";
 import useDashboardStore from "@/store/useDashboardStore";
 import {
   FaPlus,
-  FaProjectDiagram,
   FaFilter,
   FaTimes,
   FaSearch,
@@ -12,7 +11,6 @@ import {
   Button,
   ConfirmationModal,
   PageHeader,
-  NotFound,
   RightSidebar,
   Input,
 } from "@/components";
@@ -51,7 +49,6 @@ const Projects = () => {
     if (searchParams.get("new")) setIsModalOpen(true);
   }, [searchParams]);
 
-  // Filter Logic
   const filteredProjects = useMemo(() => {
     if (!projects) return [];
     return projects.filter((project) => {

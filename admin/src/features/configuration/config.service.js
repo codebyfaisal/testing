@@ -9,7 +9,6 @@ const configService = {
         const response = await api.post("/users/me/config", data);
         return response.data.data;
     },
-    // User Update (used in Config page sometimes)
     updateUser: async (data) => {
         const response = await api.put("/users/me", data);
         return response.data.data;

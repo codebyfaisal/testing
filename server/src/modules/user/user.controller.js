@@ -80,7 +80,6 @@ const getHomeData = asyncHandler(async (req, res) => {
 
     if (!user) throw new ApiError(404, "User profile not found");
 
-    // Map user data specifically for the Home Page and core app functions
     const mappedUser = {
         name: user.name,
         role: config.hero?.subTitle || user.role || "Developer",

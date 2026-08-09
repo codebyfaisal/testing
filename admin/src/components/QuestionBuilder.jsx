@@ -27,7 +27,6 @@ const QuestionBuilder = ({ questions, onChange }) => {
   };
 
   const handleOptionsChange = (index, value) => {
-    // Split by comma and trim
     const options = value.split(",").map((opt) => opt.trim());
     updateQuestion(index, { options });
   };

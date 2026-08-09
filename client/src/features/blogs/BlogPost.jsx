@@ -105,21 +105,17 @@ const BlogPost = () => {
   useEffect(() => {
     if (!post) return;
 
-    // Use a small timeout to ensure DOM is ready
     const timer = setTimeout(() => {
       const preTags = document.querySelectorAll("#blog-content pre");
 
       preTags.forEach((pre) => {
-        // Check if button already exists to prevent duplicates
         if (pre.querySelector(".copy-btn")) return;
 
-        // Ensure relative positioning for absolute button placement
         pre.style.position = "relative";
 
         const button = document.createElement("button");
         button.title = "Copy Code";
 
-        // Add group class to pre for hover effect
         pre.classList.add("group");
         button.className =
           "copy-btn absolute top-2 right-2 bg-card/80 hover:bg-card text-muted-foreground hover:text-foreground p-1.5 transition-all border border-border/50 backdrop-blur-sm shadow-sm opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity duration-200" +
@@ -133,7 +129,6 @@ const BlogPost = () => {
           try {
             await navigator.clipboard.writeText(code);
 
-            // Show Check Icon
             button.innerHTML =
               '<svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" height="16" width="16" class="text-green-500" xmlns="http://www.w3.org/2000/svg"><polyline points="20 6 9 17 4 12"></polyline></svg>';
 

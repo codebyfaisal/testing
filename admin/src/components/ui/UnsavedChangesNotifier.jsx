@@ -36,7 +36,6 @@ const UnsavedChangesNotifier = ({ isDirty, isSaving, error, onSave }) => {
               )}
             </div>
 
-            {/* Action (Only if not saving/error) */}
             {!isSaving && !error && onSave && (
               <button
                 onClick={onSave}

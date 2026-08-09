@@ -24,7 +24,6 @@ const getPostBySlug = async (slug) => {
     const post = await Post.findOne({ slug });
     if (!post) throw new ApiError(404, "Post not found");
 
-    // Increment views logic - keeping it in service as it's business logic side effect
     post.views += 1;
     await post.save({ validateBeforeSave: false });
 
@@ -65,12 +64,11 @@ const toggleLike = async (postId, email) => {
     const post = await Post.findById(postId);
     if (!post) throw new ApiError(404, "Post not found");
 
-    // Find or create subscriber (Lead Generation)
     let subscriber = await Subscriber.findOne({ email });
     if (!subscriber) {
         subscriber = await Subscriber.create({
             email,
-            isSubscribed: true // Auto-subscribe on first like? Or false? User said "keep email in subscribers". Let's assume true for lead gen.
+            isSubscribed: true
         });
     }
 

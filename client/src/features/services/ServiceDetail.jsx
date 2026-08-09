@@ -124,7 +124,7 @@ const ServiceDetail = () => {
             </div>
 
             <div className="col-span-1 lg:col-span-1">
-              {/* Features Grid (If any) */}
+              {/* Features Grid */}
               {service.features && service.features.length > 0 && (
                 <>
                   <h3 className="text-2xl font-bold mb-6 text-foreground">
@@ -222,7 +222,6 @@ const ServiceDetail = () => {
   );
 };
 
-// Simple FAQ Component
 const FAQItem = ({ question, answer, rounded }) => {
   const [isOpen, setIsOpen] = useState(false);
 

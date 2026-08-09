@@ -18,7 +18,6 @@ const jobsService = {
         return response.data.data;
     },
     
-    // Applications
     getApplications: async (params) => {
         const response = await api.get("/applications", { params });
         return response.data.data;

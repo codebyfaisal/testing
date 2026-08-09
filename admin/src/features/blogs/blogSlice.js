@@ -5,7 +5,6 @@ export const createBlogSlice = (set, get) => ({
     currentPost: null,
     blogRequestId: null,
 
-    // Actions
     fetchPosts: async (params) => {
         const requestId = Date.now();
         set({ isLoading: true, blogRequestId: requestId });

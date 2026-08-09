@@ -43,7 +43,7 @@ const Careers = () => {
         <CardSkeleton count={4} />
       ) : jobs.length > 0 ? (
         <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
-          {jobs.map((job, index) => (
+          {jobs.map((job) => (
             <div
               key={job._id}
               className={cn(

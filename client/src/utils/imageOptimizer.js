@@ -11,7 +11,6 @@ export const optimizeImage = (url, { width, height, crop = "limit" } = {}) => {
     if (!url) return "";
     if (!url.includes("cloudinary.com")) return url;
 
-    // Split URL at /upload/
     const [base, file] = url.split("/upload/");
     if (!file) return url;
 

@@ -18,7 +18,6 @@ const Subscribers = () => {
   const [loading, setLoading] = useState(true);
   const [deleteId, setDeleteId] = useState(null);
 
-  // Filter States
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState({
     search: "",
@@ -41,7 +40,6 @@ const Subscribers = () => {
     fetchSubscribers();
   }, []);
 
-  // Filter Logic
   const filteredSubscribers = useMemo(() => {
     if (!subscribers) return [];
     return subscribers.filter((sub) => {

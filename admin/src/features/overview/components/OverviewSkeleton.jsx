@@ -4,11 +4,9 @@ import { Card, Skeleton } from "@/components";
 const OverviewSkeleton = () => {
   return (
     <div className="space-y-6">
-      {/* Header removed as per user request */}
-
       <div className="space-y-6">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column: Stats Grid (2 columns wide) */}
+          {/* Stats Grid */}
           <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <Card key={i} className="flex items-center justify-between">
@@ -21,7 +19,7 @@ const OverviewSkeleton = () => {
             ))}
           </div>
 
-          {/* Right Column: Profile Health (1 column wide) */}
+          {/* Profile Health */}
           <Card>
             <div className="flex items-center justify-between mb-4">
               <Skeleton className="h-6 w-1/3" />

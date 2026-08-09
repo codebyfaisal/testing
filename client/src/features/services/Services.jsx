@@ -80,7 +80,7 @@ const Services = () => {
       ) : (
         <div className="space-y-24">
           <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {servicesData.map((service, index) => {
+            {servicesData.map((service) => {
               return (
                 <div
                   key={service._id}

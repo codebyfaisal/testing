@@ -189,7 +189,7 @@ const ServiceForm = ({ isOpen, onClose, serviceToEdit }) => {
             />
           </div>
 
-          {/* Section: Core Features (List of Strings) */}
+          {/* Core Features */}
           <div className="space-y-4">
             <div className="flex justify-between items-center border-b border-border pb-2">
               <h3 className="text-lg font-semibold text-foreground">

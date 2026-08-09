@@ -36,7 +36,6 @@ const updateJob = async (id, data) => {
     );
     if (!job) throw new ApiError(404, "Job not found");
 
-    // Sync with Form if lastDate is updated
     if (data.lastDate) await Form.findOneAndUpdate(
         { job: id },
         { $set: { expiryDate: data.lastDate } }

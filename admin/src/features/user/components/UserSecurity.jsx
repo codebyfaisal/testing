@@ -76,7 +76,6 @@ const UserSecurity = () => {
             className="sm:col-span-7 md:col-span-6 lg:col-span-7 xl:col-span-8"
           />
 
-          {/* <div className="sm:col-span-3 md:col-span-4 lg:col-span-3 xl:col-span-2 flex justify-center items-end pb-2.5"> */}
           <Button
             type="submit"
             label="Update Password"
@@ -84,7 +83,6 @@ const UserSecurity = () => {
             disabled={!newPassword}
             onClick={handleInitialSubmit}
           />
-          {/* </div> */}
         </form>
       </Card>
 

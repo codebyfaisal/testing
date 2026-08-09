@@ -11,7 +11,6 @@ import {
   PrivacyBanner,
 } from "@/components";
 
-// Lazy Load Pages
 const Home = React.lazy(() => import("@/features/home/Home"));
 const About = React.lazy(() => import("@/features/about/About"));
 const Services = React.lazy(() => import("@/features/services/Services"));
@@ -33,7 +32,6 @@ const TrackApplication = React.lazy(
 const Contact = React.lazy(() => import("@/features/contact/Contact"));
 const NotFound = React.lazy(() => import("@/features/error/NotFound"));
 
-// Initial Error Component (Keep eager or lazy)
 import ServerError from "@/features/error/ServerError";
 import Maintenance from "@/features/error/Maintenance";
 import usePortfolioStore from "@/store/usePortfolioStore";

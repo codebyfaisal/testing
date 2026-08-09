@@ -11,12 +11,10 @@ import {
 } from "react-icons/fa";
 import { Button, Card, PageHeader } from "@/components";
 import OverviewSkeleton from "./components/OverviewSkeleton";
-import toast from "react-hot-toast";
 import { motion } from "motion/react";
 
 const Overview = () => {
   const {
-    user,
     overview,
     visitorStats,
     isLoadingOverview,
@@ -100,7 +98,7 @@ const Overview = () => {
         >
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
-              {stats.map((stat, index) => (
+              {stats.map((stat) => (
                 <Card
                   key={stat.label}
                   className="flex items-center justify-between group hover:border-primary transition-colors"

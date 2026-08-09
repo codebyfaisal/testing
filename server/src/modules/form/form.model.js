@@ -11,7 +11,6 @@ const formSchema = new Schema(
             type: String,
             trim: true,
         },
-        // Slug removed as per user request to use ID
         job: {
             type: Schema.Types.ObjectId,
             ref: "Job",

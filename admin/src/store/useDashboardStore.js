@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 
-// Import Slices
 import { createAuthSlice } from "@/features/auth/authSlice";
 import { createServiceSlice } from "@/features/services/serviceSlice";
 import { createPlanSlice } from "@/features/plans/planSlice";
@@ -19,7 +18,6 @@ const useDashboardStore = create((set, get, ...a) => ({
     isLoading: false,
     error: null,
 
-    // Spread Slices
     ...createAuthSlice(set, get, ...a),
     ...createServiceSlice(set, get, ...a),
     ...createPlanSlice(set, get, ...a),

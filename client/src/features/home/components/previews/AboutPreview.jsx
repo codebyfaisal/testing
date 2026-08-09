@@ -32,7 +32,6 @@ const AboutPreview = ({ className }) => {
   const description =
     config.about?.description || user.bio || aboutConfig?.description;
 
-  // Transform user stats object to array
   const statsObj = user.stats || {};
   const stats = [
     { value: statsObj.yearOfExperience || 0, label: aboutConfig?.stats?.years },

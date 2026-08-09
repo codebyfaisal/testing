@@ -10,12 +10,6 @@ export const createStatSlice = (set, get) => ({
     isLoadingOverview: true,
     isLoadingVisitorStats: true,
     isLoadingVisits: true,
-    // Deprecated single loader for backward compatibility if needed, using a getter? 
-    // For now we remove isLoadingStats usage or map it. 
-    // But existing components (Visitors.jsx) rely on isLoadingStats. 
-    // We will keep isLoadingStats as a computed property or sync it with isLoadingVisits? 
-    // Better to rename in components. But to avoid breaking, let's keep isLoadingStats mirroring isLoadingVisits or just remove it and fix components.
-    // I will fix components.
     statsError: null,
 
     fetchOverviewStats: async () => {
@@ -40,7 +34,7 @@ export const createStatSlice = (set, get) => ({
         const { visitorStatsPromise } = get();
         if (visitorStatsPromise) return visitorStatsPromise;
 
-        set({ isLoadingVisitorStats: true }); // Explicitly set loading
+        set({ isLoadingVisitorStats: true });
 
         const promise = visitorsService.getVisitorStats().then((stats) => {
             set({ visitorStats: stats, visitorStatsPromise: null, isLoadingVisitorStats: false });
@@ -71,7 +65,6 @@ export const createStatSlice = (set, get) => ({
         try {
             await visitorsService.deleteVisits(ids);
 
-            // Local update (Optimistic UI)
             const { visits } = get();
             if (visits && visits.visits) {
                 const newVisits = visits.visits.filter(v => !ids.includes(v._id));
@@ -90,7 +83,6 @@ export const createStatSlice = (set, get) => ({
                 set({ isLoadingVisits: false });
             }
 
-            // Refresh stats to ensure consistency
             get().fetchVisitorStats();
         } catch (error) {
             set({ statsError: getErrorMessage(error), isLoadingVisits: false });
@@ -103,7 +95,6 @@ export const createStatSlice = (set, get) => ({
         try {
             await visitorsService.cleanupVisits();
 
-            // Optimistic Clear
             const { visits } = get();
             if (visits) {
                 set({

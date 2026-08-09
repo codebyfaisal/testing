@@ -83,7 +83,6 @@ const Configuration = () => {
     getConfig,
     updateConfig,
     fetchServices,
-    isLoading,
     resetConfigState,
   } = useDashboardStore();
 

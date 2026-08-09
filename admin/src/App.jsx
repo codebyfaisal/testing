@@ -47,7 +47,7 @@ const PublicGuard = ({ children }) => {
 import { ThemeProvider } from "@/context/ThemeContext";
 
 function App() {
-  const { checkAdminStatus, getUser, user } = useDashboardStore();
+  const { checkAdminStatus, getUser } = useDashboardStore();
   const [isReady, setIsReady] = useState(false);
   const [initError, setInitError] = useState(null);
 
@@ -61,7 +61,9 @@ function App() {
       if (import.meta.env.DEV) {
         console.error("Auth initialization failed:", err);
       }
-      setInitError("Failed to initialize application. Unable to connect to backend server.");
+      setInitError(
+        "Failed to initialize application. Unable to connect to backend server.",
+      );
     } finally {
       setIsReady(true);
     }
@@ -193,6 +195,14 @@ function App() {
               }
             />
             <Route
+              path="files-manager"
+              element={
+                <ErrorBoundary>
+                  <FileManager />
+                </ErrorBoundary>
+              }
+            />
+            <Route
               path="files"
               element={
                 <ErrorBoundary>
@@ -226,8 +236,8 @@ function App() {
             />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
-        </>
-      )
+        </>,
+      ),
     );
   }, []);
 
@@ -235,7 +245,9 @@ function App() {
     return (
       <div className="min-h-screen bg-background text-foreground flex flex-col items-center justify-center p-6 text-center space-y-4">
         <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-xl space-y-2 max-w-md">
-          <h2 className="text-xl font-bold text-destructive">Initialization Failed</h2>
+          <h2 className="text-xl font-bold text-destructive">
+            Initialization Failed
+          </h2>
           <p className="text-sm text-muted-foreground">{initError}</p>
           <button
             onClick={initApp}

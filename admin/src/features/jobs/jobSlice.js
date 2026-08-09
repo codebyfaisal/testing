@@ -1,13 +1,12 @@
 import jobsService from './jobs.service';
 
-export const createJobSlice = (set, get) => ({
+export const createJobSlice = (set) => ({
     jobs: [],
     job: null,
     applications: [],
     application: null,
     isApplicationsLoading: true,
 
-    // Jobs
     fetchJobs: async (status = "") => {
         set({ isLoading: true, error: null });
         try {
@@ -69,12 +68,9 @@ export const createJobSlice = (set, get) => ({
         }
     },
 
-    // Applications
     fetchApplications: async (filters = {}) => {
         set({ isApplicationsLoading: true, error: null });
         try {
-            // filters can be { jobId, search, status, from, to }
-            // jobsService.getApplications sends params directly
             const data = await jobsService.getApplications(filters);
             set({ applications: data });
             return data;
@@ -118,7 +114,6 @@ export const createJobSlice = (set, get) => ({
         }
     },
 
-    // Reset Actions
     resetJobsState: () => {
         set({ jobs: [], isLoading: true });
     },

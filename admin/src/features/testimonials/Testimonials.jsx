@@ -37,7 +37,6 @@ const Testimonials = () => {
     id: null,
   });
 
-  // Filter States
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState({
     search: "",
@@ -48,7 +47,6 @@ const Testimonials = () => {
     return () => resetTestimonialState();
   }, [fetchTestimonials, resetTestimonialState]);
 
-  // Filter Logic
   const filteredTestimonials = useMemo(() => {
     if (!testimonials) return [];
     return testimonials.filter((t) => {

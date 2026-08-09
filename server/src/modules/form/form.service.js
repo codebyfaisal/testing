@@ -45,7 +45,6 @@ const updateForm = async (id, data) => {
     });
     if (!form) throw new ApiError(404, "Form not found");
 
-    // Sync with Job if expiryDate is updated and form is linked to a job
     if (data.expiryDate && form.job) {
         await Job.findByIdAndUpdate(
             form.job,

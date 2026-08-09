@@ -2,7 +2,6 @@ import mongoose from "mongoose";
 import dns from "node:dns";
 import { MONGODB_URI, DB_NAME } from "../constants.js";
 
-// Force Node.js to use public DNS resolvers (8.8.8.8 / 1.1.1.1) to fix querySrv ECONNREFUSED errors on Windows
 try {
   dns.setServers(["8.8.8.8", "1.1.1.1"]);
 } catch (dnsErr) {

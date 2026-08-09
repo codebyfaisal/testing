@@ -100,18 +100,14 @@ const User = () => {
     setIsConfirmOpen(true);
   };
 
-  // Track initial data to determine dirty state
   const [initialData, setInitialData] = useState(null);
   const [saveError, setSaveError] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
-  // Check if form is dirty
   const isDirty = useMemo(() => {
     if (!initialData) return false;
     return JSON.stringify(formData) !== JSON.stringify(initialData);
   }, [formData, initialData]);
-
-  // Block navigation if dirty
   const blocker = useBlocker(
     ({ currentLocation, nextLocation }) =>
       isDirty && currentLocation.pathname !== nextLocation.pathname

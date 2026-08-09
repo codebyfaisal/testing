@@ -16,7 +16,7 @@ export default defineConfig({
     drop: process.env.NODE_ENV === "production" ? ["console", "debugger"] : [],
   },
   build: {
-    sourcemap: false, // Security: Disable production sourcemaps (BUG-020)
+    sourcemap: false, // Disable production sourcemaps
     rollupOptions: {
       output: {
         manualChunks(id) {

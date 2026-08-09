@@ -1,7 +1,7 @@
 import configService from './config.service';
 
-export const createConfigSlice = (set, get) => ({
-    config: { rounded: true }, // Default
+export const createConfigSlice = (set) => ({
+    config: { rounded: true },
 
     updateConfig: async (configData) => {
         set((state) => ({

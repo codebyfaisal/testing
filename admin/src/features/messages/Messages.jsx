@@ -41,7 +41,6 @@ const Messages = () => {
     id: null,
   });
 
-  // Filter States
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState({
     search: "",
@@ -55,7 +54,6 @@ const Messages = () => {
     return () => resetMessageState();
   }, [fetchMessages, getConfig, resetMessageState]);
 
-  // Filter Logic
   const filteredMessages = useMemo(() => {
     if (!messages) return [];
     return messages.filter((msg) => {

@@ -55,7 +55,6 @@ const Forms = () => {
   const [formData, setFormData] = useState(initialFormState);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Filter States
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState({
     search: "",
@@ -89,7 +88,6 @@ const Forms = () => {
     return true;
   };
 
-  // Filter Logic
   const filteredForms = useMemo(() => {
     if (!forms) return [];
     return forms.filter((form) => {

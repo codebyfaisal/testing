@@ -22,7 +22,7 @@ const recordVisit = async (ip, userAgent) => {
             userAgent,
             country: geo?.country,
             city: geo?.city,
-            browser: userAgent, // Ideally parse this
+            browser: userAgent,
             platform: "Unknown" // Ideally parse this
         });
         return { recorded: true };
@@ -44,7 +44,7 @@ const getVisitStats = async () => {
     return {
         totalVisits,
         uniqueVisitors: uniqueVisitors.length,
-        items: visitsByCountry // keeping format expected by frontend
+        items: visitsByCountry
     };
 };
 

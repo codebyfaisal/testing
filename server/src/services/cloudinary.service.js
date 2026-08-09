@@ -19,7 +19,6 @@ const uploadOnCloudinary = async (fileBuffer) => {
             },
             (error, result) => {
                 if (error) return reject(error);
-                // Enforce HTTPS
                 if (result.secure_url) {
                     result.url = result.secure_url;
                 }
@@ -42,12 +41,14 @@ const deleteFromCloudinary = async (publicId) => {
 
 };
 
-const getCloudinaryResources = async (resourceType = "image", next_cursor = null) => {
+const getCloudinaryResources = async (resourceType = "all", next_cursor = null) => {
     const folderName = CLOUDINARY_FOLDER || "portfolio";
-    const folderFilter = `folder:"${folderName}/*"`;
+    const folderFilter = `folder:"${folderName}*"`;
     let expression = "";
 
-    switch (resourceType) {
+    const type = (resourceType || "").toLowerCase();
+
+    switch (type) {
         case "images":
         case "image":
             expression = `${folderFilter} AND resource_type:image AND NOT format:pdf`;
@@ -56,15 +57,14 @@ const getCloudinaryResources = async (resourceType = "image", next_cursor = null
         case "video":
             expression = `${folderFilter} AND resource_type:video`;
             break;
-        case "PDF":
+        case "pdf":
             expression = `${folderFilter} AND resource_type:image AND format:pdf`;
             break;
         case "others":
+        case "other":
             expression = `${folderFilter} AND resource_type:raw`;
             break;
-        case "All":
-            expression = folderFilter;
-            break;
+        case "all":
         default:
             expression = folderFilter;
             break;
@@ -79,7 +79,6 @@ const getCloudinaryResources = async (resourceType = "image", next_cursor = null
 
     const result = await search.execute();
 
-    // Enforce HTTPS on fetched resources
     if (result.resources) {
         result.resources = result.resources.map(resource => ({
             ...resource,

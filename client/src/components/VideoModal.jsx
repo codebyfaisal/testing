@@ -15,7 +15,6 @@ const getVideoEmbedDetails = (videoProp) => {
 
   if (!rawUrl) return null;
 
-  // Check if HTML iframe string
   if (rawUrl.startsWith("<iframe") || videoProp.type === "iframe") {
     return { type: "html", html: rawUrl };
   }

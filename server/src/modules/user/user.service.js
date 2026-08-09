@@ -7,7 +7,6 @@ import { ApiError } from "../../utils/ApiError.js";
 const ensureSingleUser = async () => {
     const users = await User.find();
     if (users.length > 1) {
-        // Find the user document with portfolio data (e.g. bio or non-default email)
         const primaryUser = users.find(u => u.bio || (u.email && u.email !== "admin@example.com")) || users[0];
         await User.deleteMany({ _id: { $ne: primaryUser._id } });
         return primaryUser;

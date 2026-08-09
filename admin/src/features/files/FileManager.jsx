@@ -14,22 +14,29 @@ const UploadBtn = ({ loading, uploading, handleFileUpload, loadMedia }) => {
         onClick={() => loadMedia(true)}
         icon={<FaSync className={loading ? "animate-spin" : ""} />}
         uiType="secondary"
-        disabled={loading}
-        className="file-manager-reload-btn pt-3 pb-2.5 sm:py-3"
+        disabled={loading || uploading}
+        className="file-manager-reload-btn pt-3 pb-2.5 sm:py-3 cursor-pointer"
+        title="Refresh files"
       />
 
       <div className="relative overflow-hidden">
         <Button
           label={uploading ? "Uploading..." : "Upload File"}
-          icon={<FaCloudUploadAlt size={18} />}
+          icon={
+            <FaCloudUploadAlt
+              size={18}
+              className={uploading ? "animate-bounce" : ""}
+            />
+          }
           uiType="primary"
-          disabled={uploading}
+          disabled={uploading || loading}
+          className="cursor-pointer"
         />
         <input
           type="file"
-          className="absolute inset-0 opacity-0 cursor-pointer"
+          className="absolute inset-0 opacity-0 cursor-pointer disabled:cursor-not-allowed"
           onChange={handleFileUpload}
-          disabled={uploading}
+          disabled={uploading || loading}
         />
       </div>
     </div>
@@ -41,7 +48,7 @@ const FileManager = ({ isModal = false, resType = "all", onSelect }) => {
   const { fetchFiles, deleteFile, uploadFile } = useDashboardStore();
   const [files, setFiles] = useState([]);
   const [resourceType, setResourceType] = useState(
-    searchParams.get("resourceType") || resType
+    searchParams.get("resourceType") || resType,
   );
   const [nextCursor, setNextCursor] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -57,10 +64,11 @@ const FileManager = ({ isModal = false, resType = "all", onSelect }) => {
     setLoading(true);
     try {
       const data = await fetchFiles(resourceType, cursor);
-      if (reset) setFiles(data.resources);
-      else setFiles((prev) => [...prev, ...data.resources]);
+      if (reset) setFiles(data.resources || []);
+      else setFiles((prev) => [...prev, ...(data.resources || [])]);
       setNextCursor(data.next_cursor);
     } catch (error) {
+      console.error("Error loading media:", error);
       toast.error("Failed to load media");
     } finally {
       setLoading(false);
@@ -74,9 +82,10 @@ const FileManager = ({ isModal = false, resType = "all", onSelect }) => {
   }, [resourceType]);
 
   const handleDelete = async (publicId) => {
+    if (uploading || loading) return;
     if (
       !window.confirm(
-        "Are you sure you want to delete this file? This cannot be undone."
+        "Are you sure you want to delete this file? This cannot be undone.",
       )
     )
       return;
@@ -95,22 +104,39 @@ const FileManager = ({ isModal = false, resType = "all", onSelect }) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    // File Upload Security Validation (BUG-013)
+    // File Upload Security Validation
     const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB Limit
     const DANGEROUS_EXTENSIONS = [
-      "exe", "bat", "cmd", "sh", "php", "js", "py", "dll", "msi", "vbs", "ps1", "jar", "asp", "aspx"
+      "exe",
+      "bat",
+      "cmd",
+      "sh",
+      "php",
+      "js",
+      "py",
+      "dll",
+      "msi",
+      "vbs",
+      "ps1",
+      "jar",
+      "asp",
+      "aspx",
     ];
 
     const fileExtension = file.name.split(".").pop().toLowerCase();
 
     if (DANGEROUS_EXTENSIONS.includes(fileExtension)) {
-      toast.error(`Security Warning: Files with extension .${fileExtension} are not allowed.`);
+      toast.error(
+        `Security Warning: Files with extension .${fileExtension} are not allowed.`,
+      );
       e.target.value = null;
       return;
     }
 
     if (file.size > MAX_FILE_SIZE) {
-      toast.error(`File size exceeds max limit of 10MB (${(file.size / (1024 * 1024)).toFixed(2)}MB)`);
+      toast.error(
+        `File size exceeds max limit of 10MB (${(file.size / (1024 * 1024)).toFixed(2)}MB)`,
+      );
       e.target.value = null;
       return;
     }
@@ -119,9 +145,22 @@ const FileManager = ({ isModal = false, resType = "all", onSelect }) => {
     try {
       const newMedia = await uploadFile(file);
       toast.success("File uploaded successfully");
-      loadMedia(true);
+
+      if (newMedia && newMedia.public_id) {
+        const formattedMedia = {
+          ...newMedia,
+          url: newMedia.secure_url || newMedia.url,
+        };
+        setFiles((prev) => [
+          formattedMedia,
+          ...prev.filter((f) => f.public_id !== formattedMedia.public_id),
+        ]);
+      } else {
+        await loadMedia(true);
+      }
     } catch (error) {
-      toast.error("Failed to upload file");
+      console.error("Upload error:", error);
+      toast.error(error?.response?.data?.message || "Failed to upload file");
     } finally {
       setUploading(false);
       e.target.value = null;
@@ -134,39 +173,33 @@ const FileManager = ({ isModal = false, resType = "all", onSelect }) => {
   };
 
   return (
-    <div className={cn(isModal ? "space-y-4" : "space-y-6")}>
-      <header className={cn(isModal && "mb-0")}>
-        <div className={isModal ? "hidden" : ""}>
+    <div className="relative">
+      {!isModal && (
+        <header className="mb-6">
           <PageHeader
             title="File Manager"
             description="Manage your cloud assets (images, videos, PDFs)."
             children={
-              !isModal && (
-                <UploadBtn
-                  loading={loading}
-                  uploading={uploading}
-                  handleFileUpload={handleFileUpload}
-                  loadMedia={loadMedia}
-                />
-              )
+              <UploadBtn
+                loading={loading}
+                uploading={uploading}
+                handleFileUpload={handleFileUpload}
+                loadMedia={loadMedia}
+              />
             }
           />
-        </div>
-      </header>
+        </header>
+      )}
 
       {/* Filters */}
-      <div className="flex items-center justify-between">
-        <div
-          className={cn(
-            "flex gap-2 overflow-x-auto",
-            !isModal && "border-b border-border pb-2"
-          )}
-        >
-          {["all", "images", "videos", "PDF", "others"].map((type, index) =>
+      <div className="flex items-center justify-between mb-4 gap-4 flex-wrap">
+        <div className="flex gap-2 overflow-x-auto pb-2">
+          {["all", "images", "videos", "PDF", "others"].map((type) =>
             isModal && type === "others" ? null : (
               <button
                 type="button"
-                key={index}
+                key={type}
+                disabled={loading || uploading}
                 onClick={() => {
                   if (!isModal) {
                     searchParams.set("resourceType", type);
@@ -174,16 +207,17 @@ const FileManager = ({ isModal = false, resType = "all", onSelect }) => {
                   }
                   setResourceType(type);
                 }}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors capitalize
-                ${
+                className={cn(
+                  "px-4 py-2 rounded-lg text-sm font-medium transition-colors capitalize cursor-pointer",
                   resourceType === type
                     ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                }`}
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted",
+                  (loading || uploading) && "opacity-50 cursor-not-allowed",
+                )}
               >
                 {type}
               </button>
-            )
+            ),
           )}
         </div>
 
@@ -197,7 +231,26 @@ const FileManager = ({ isModal = false, resType = "all", onSelect }) => {
         )}
       </div>
 
-      <div className={isModal ? "" : "space-y-6"}>
+      <div
+        className={cn(
+          "relative transition-all duration-300",
+          uploading && "pointer-events-none opacity-60",
+        )}
+      >
+        {uploading && (
+          <div className="absolute inset-0 z-30 bg-background/70 backdrop-blur-xs flex flex-col items-center justify-center gap-3 rounded-xl border border-border/50 p-6 min-h-[250px]">
+            <div className="w-10 h-10 border-3 border-primary border-t-transparent rounded-full animate-spin" />
+            <div className="text-center space-y-1">
+              <p className="text-sm font-semibold text-foreground">
+                Uploading file...
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Please wait while your media is uploaded & processed.
+              </p>
+            </div>
+          </div>
+        )}
+
         <FileGrid
           files={files}
           onDelete={handleDelete}
@@ -219,14 +272,14 @@ const FileManager = ({ isModal = false, resType = "all", onSelect }) => {
               label="Load More"
               onClick={() => loadMedia(false, nextCursor)}
               uiType="secondary"
-              disabled={loading}
+              disabled={loading || uploading}
             />
           </div>
         )}
       </div>
 
       <Modal
-        title="Preview Video"
+        title="Preview Media"
         isOpen={openModal}
         onClose={() => setOpenModal(false)}
       >
@@ -234,13 +287,13 @@ const FileManager = ({ isModal = false, resType = "all", onSelect }) => {
           <video
             src={preview.url}
             controls
-            className="w-full h-[60vh] object-contain"
+            className="w-full h-[60vh] object-contain rounded-lg"
           ></video>
         ) : (
           <img
             src={preview.url}
-            alt=""
-            className="w-full h-[60vh] object-contain"
+            alt="Preview"
+            className="w-full h-[60vh] object-contain rounded-lg"
           />
         )}
       </Modal>

@@ -19,7 +19,6 @@ const LikeButton = ({ postId, initialLikesCount = 0 }) => {
 
     const storedEmail = localStorage.getItem("user_email");
 
-    // Optimistic UI: Check local cache first
     try {
       const likedPosts = JSON.parse(
         localStorage.getItem("user_liked_posts") || "[]",
@@ -46,7 +45,6 @@ const LikeButton = ({ postId, initialLikesCount = 0 }) => {
 
       setLiked(isLiked);
 
-      // Sync local cache with server truth
       const likedPosts = JSON.parse(
         localStorage.getItem("user_liked_posts") || "[]",
       );
@@ -71,7 +69,6 @@ const LikeButton = ({ postId, initialLikesCount = 0 }) => {
   };
 
   const handleLikeClick = async () => {
-    // Try getting email from state, then LS
     let currentEmail = email || localStorage.getItem("user_email");
 
     if (!currentEmail) {
@@ -84,7 +81,6 @@ const LikeButton = ({ postId, initialLikesCount = 0 }) => {
   const toggleLike = async (userEmail) => {
     setLoading(true);
 
-    // Optimistic Update
     const previousLiked = liked;
     const previousCount = likesCount;
 
@@ -101,7 +97,6 @@ const LikeButton = ({ postId, initialLikesCount = 0 }) => {
       setLikesCount(newCount);
       toast.success(isLiked ? "Thanks for liking!" : "Like removed");
 
-      // Update local storage cache
       const likedPosts = JSON.parse(
         localStorage.getItem("user_liked_posts") || "[]",
       );
@@ -121,7 +116,6 @@ const LikeButton = ({ postId, initialLikesCount = 0 }) => {
     } catch (error) {
       console.error("Like error:", error);
       toast.error("Something went wrong");
-      // Revert on error
       setLiked(previousLiked);
       setLikesCount(previousCount);
     } finally {

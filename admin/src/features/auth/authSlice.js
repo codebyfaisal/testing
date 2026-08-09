@@ -1,10 +1,10 @@
 import authService from './auth.service';
 import { getErrorMessage } from "@/store/utils";
 
-export const createAuthSlice = (set, get) => ({
+export const createAuthSlice = (set) => ({
     user: null,
     hasAdmin: null,
-    isLoadingAuth: false, // Specific loading state for auth to avoid conflicts
+    isLoadingAuth: false,
     authError: null,
 
     checkAdminStatus: async () => {
@@ -41,7 +41,7 @@ export const createAuthSlice = (set, get) => ({
                 console.warn("Server logout notification failed:", error);
             }
         } finally {
-            // Complete memory and storage wipe (SEC-009)
+            // Complete memory and storage wipe
             set({
                 user: null,
                 isLoadingAuth: false,
@@ -62,7 +62,7 @@ export const createAuthSlice = (set, get) => ({
                 localStorage.clear();
                 sessionStorage.clear();
             } catch (storageErr) {
-                // Ignore storage clear issues if blocked
+                console.error("Failed to clear storage:", storageErr);
             }
         }
     },

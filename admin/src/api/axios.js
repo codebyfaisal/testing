@@ -5,7 +5,7 @@ import useDashboardStore from "@/store/useDashboardStore";
 const api = axios.create({
     baseURL: BASE_API_URL,
     withCredentials: true,
-    timeout: 10000, // 10 seconds timeout protection (BUG-004)
+    timeout: 10000, // 10 seconds timeout protection
 });
 
 api.interceptors.request.use(
@@ -16,7 +16,7 @@ api.interceptors.request.use(
 api.interceptors.response.use(
     (response) => response,
     (error) => {
-        // Safe message extraction covering network errors, timeouts, and missing responses (BUG-005)
+        // Safe message extraction covering network errors and timeouts
         let message = "An unexpected error occurred";
         if (error.code === "ECONNABORTED") {
             message = "Request timed out. Please check your connection and try again.";
@@ -28,7 +28,7 @@ api.interceptors.response.use(
             message = error.message;
         }
 
-        // Global 401 Unauthorized handling (BUG-006)
+        // Global 401 Unauthorized handling
         if (error.response?.status === 401) {
             const currentPath = window.location.pathname;
             if (currentPath !== "/login") {

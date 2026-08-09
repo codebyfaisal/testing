@@ -218,7 +218,6 @@ const PlanForm = ({ isOpen, onClose, planToEdit }) => {
               placeholder="1000"
               className="md:col-span-1"
             />
-            {/* Display Price removed as it wasn't in the object logic above, keeping consistent with simple fields */}
           </div>
 
           <Textarea
