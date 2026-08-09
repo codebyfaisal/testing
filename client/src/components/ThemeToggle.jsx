@@ -1,64 +1,38 @@
 import React from "react";
-import { FaSun, FaMoon, FaDesktop } from "react-icons/fa";
+import { FaSun, FaMoon } from "react-icons/fa";
 import { useTheme } from "@/context/ThemeContext";
 import { cn } from "@/utils/cn";
-import usePortfolioStore from "@/store/usePortfolioStore";
 
 const ThemeToggle = ({ className }) => {
   const { theme, setTheme } = useTheme();
-  const rounded = usePortfolioStore((state) => state.rounded);
+
+  const isDark =
+    theme === "dark" ||
+    (theme === "system" &&
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches);
+
+  const toggleTheme = () => {
+    setTheme(isDark ? "light" : "dark");
+  };
 
   return (
-    <div
+    <button
+      onClick={toggleTheme}
+      type="button"
       className={cn(
-        "flex items-center gap-1 p-1 bg-secondary/10 border border-border",
-        rounded,
+        "p-1.5 !bg-transparent hover:bg-black/5 dark:hover:bg-white/10 transition-colors duration-200 flex items-center justify-center cursor-pointer rounded-lg !border-0 !border-none outline-none !shadow-none",
         className,
       )}
+      title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
+      aria-label="Toggle Theme"
     >
-      <button
-        onClick={() => setTheme("light")}
-        className={cn(
-          "p-1.5 transition-all",
-          rounded,
-          theme === "light"
-            ? "bg-background text-foreground shadow-sm"
-            : "text-muted-foreground hover:text-foreground",
-        )}
-        title="Light Mode"
-        aria-label="Switch to Light Mode"
-      >
-        <FaSun size={14} />
-      </button>
-      <button
-        onClick={() => setTheme("dark")}
-        className={cn(
-          "p-1.5 transition-all",
-          rounded,
-          theme === "dark"
-            ? "bg-background text-foreground shadow-sm"
-            : "text-muted-foreground hover:text-foreground",
-        )}
-        title="Dark Mode"
-        aria-label="Switch to Dark Mode"
-      >
-        <FaMoon size={14} />
-      </button>
-      <button
-        onClick={() => setTheme("system")}
-        className={cn(
-          "p-1.5 transition-all",
-          rounded,
-          theme === "system"
-            ? "bg-background text-foreground shadow-sm"
-            : "text-muted-foreground hover:text-foreground",
-        )}
-        title="System Preference"
-        aria-label="Switch to System Preference"
-      >
-        <FaDesktop size={14} />
-      </button>
-    </div>
+      {isDark ? (
+        <FaSun className="text-amber-400 text-lg" />
+      ) : (
+        <FaMoon className="text-black text-lg" />
+      )}
+    </button>
   );
 };
 

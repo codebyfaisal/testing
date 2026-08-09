@@ -47,7 +47,7 @@ function App() {
   if (serverError) return <ServerError />;
 
   return (
-    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+    <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
       <InnerApp config={config} fetchHomeData={fetchHomeData} />
     </ThemeProvider>
   );

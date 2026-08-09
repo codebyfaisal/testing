@@ -194,7 +194,7 @@ const Hero = ({ heroConfig }) => {
       <VideoModal
         isOpen={isVideoOpen}
         onClose={() => setIsVideoOpen(false)}
-        video={{ src: user?.introVideo }}
+        video={user?.introVideo}
       />
     </section>
   );

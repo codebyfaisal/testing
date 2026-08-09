@@ -1,46 +1,34 @@
 import React from "react";
-import { FaMoon, FaSun, FaDesktop } from "react-icons/fa";
+import { FaSun, FaMoon } from "react-icons/fa";
 import { useTheme } from "@/context/ThemeContext";
 
-const ThemeToggle = () => {
+const ThemeToggle = ({ className = "" }) => {
   const { theme, setTheme } = useTheme();
 
+  const isDark =
+    theme === "dark" ||
+    (theme === "system" &&
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches);
+
+  const toggleTheme = () => {
+    setTheme(isDark ? "light" : "dark");
+  };
+
   return (
-    <div className="flex items-center gap-1 p-1 bg-secondary rounded-lg border border-border">
-      <button
-        onClick={() => setTheme("light")}
-        className={`p-1.5 rounded-md transition-all ${
-          theme === "light"
-            ? "bg-background text-foreground shadow-sm"
-            : "text-muted-foreground hover:text-foreground"
-        }`}
-        title="Light Mode"
-      >
-        <FaSun size={14} />
-      </button>
-      <button
-        onClick={() => setTheme("dark")}
-        className={`p-1.5 rounded-md transition-all ${
-          theme === "dark"
-            ? "bg-background text-foreground shadow-sm"
-            : "text-muted-foreground hover:text-foreground"
-        }`}
-        title="Dark Mode"
-      >
-        <FaMoon size={14} />
-      </button>
-      <button
-        onClick={() => setTheme("system")}
-        className={`p-1.5 rounded-md transition-all ${
-          theme === "system"
-            ? "bg-background text-foreground shadow-sm"
-            : "text-muted-foreground hover:text-foreground"
-        }`}
-        title="System Preference"
-      >
-        <FaDesktop size={14} />
-      </button>
-    </div>
+    <button
+      onClick={toggleTheme}
+      type="button"
+      className={`p-1.5 !bg-transparent hover:bg-black/5 dark:hover:bg-white/10 transition-colors duration-200 flex items-center justify-center cursor-pointer rounded-lg !border-0 !border-none outline-none !shadow-none ${className}`}
+      title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
+      aria-label="Toggle Theme"
+    >
+      {isDark ? (
+        <FaSun className="text-amber-400 text-lg" />
+      ) : (
+        <FaMoon className="text-black text-lg" />
+      )}
+    </button>
   );
 };
 
