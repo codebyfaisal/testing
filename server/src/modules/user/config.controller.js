@@ -3,8 +3,8 @@ import { asyncHandler } from "../../utils/asyncHandler.js";
 import { ConfigService } from "./config.service.js";
 
 const updateConfig = asyncHandler(async (req, res) => {
-    const { hero, about, messageTypes, appearance, featuredService } = req.body;
-    const config = await ConfigService.updateConfig({ hero, about, messageTypes, appearance, featuredService });
+    const { hero, about, messageTypes, appearance, footer, navigation, maintenance } = req.body;
+    const config = await ConfigService.updateConfig({ hero, about, messageTypes, appearance, footer, navigation, maintenance });
 
     return res.status(200).json(
         new ApiResponse(200, config, "Config updated successfully")

@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import api from "@/api/axios";
 import usePortfolioStore from "@/store/usePortfolioStore";
 import { FaGithub, FaExternalLinkAlt, FaArrowRight } from "react-icons/fa";
 import { Link } from "react-router-dom";
@@ -14,9 +15,52 @@ import { cn } from "@/utils/cn";
 import { siteConfig } from "@/config/siteConfig";
 
 const Projects = () => {
-  const { data, rounded, loading } = usePortfolioStore();
-  const projectsData = data?.projects || [];
-  const plans = data?.plans || [];
+  const { rounded } = usePortfolioStore();
+  const [projectsData, setProjectsData] = useState([]);
+  const [plans, setPlans] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+
+  const fetchProjectsPageData = async (pageNum = 1) => {
+    try {
+      if (pageNum === 1) setLoading(true);
+      else setLoadingMore(true);
+
+      const [projectsRes, plansRes] = await Promise.all([
+        api.get(`/projects/public?page=${pageNum}&limit=6`),
+        pageNum === 1 ? api.get("/services/plans") : Promise.resolve(null),
+      ]);
+
+      const { projects, hasMore: more } = projectsRes.data.data;
+
+      if (pageNum === 1) {
+        setProjectsData(projects || []);
+        if (plansRes) setPlans(plansRes.data?.data || []);
+      } else {
+        setProjectsData((prev) => [...prev, ...(projects || [])]);
+      }
+      
+      setHasMore(more);
+    } catch (error) {
+      console.error("Failed to fetch projects data:", error);
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProjectsPageData(1);
+  }, []);
+
+  const handleLoadMore = () => {
+    const nextPage = page + 1;
+    setPage(nextPage);
+    fetchProjectsPageData(nextPage);
+  };
+
   const projectsConfig = siteConfig?.pages?.projects;
 
   return (
@@ -103,6 +147,19 @@ const Projects = () => {
               </div>
             ))}
           </section>
+
+          {hasMore && (
+            <div className="flex justify-center mt-12">
+              <Button
+                variant="secondary"
+                onClick={handleLoadMore}
+                disabled={loadingMore}
+                className="px-8 py-3 font-semibold tracking-wide"
+              >
+                {loadingMore ? "Loading..." : "Load More Projects"}
+              </Button>
+            </div>
+          )}
 
           {/* Web Development Plans Section */}
           {plans && plans.length > 0 && <Plans plans={plans} />}

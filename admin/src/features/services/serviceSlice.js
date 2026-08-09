@@ -42,45 +42,50 @@ export const createServiceSlice = (set, get) => ({
     },
 
     addService: async (serviceData) => {
-        set({ isLoading: true });
         try {
             const newService = await servicesService.createService(serviceData);
             set((state) => {
-                const newServices = [...(state.services || []), newService];
+                const newServices = [...(state.services || [])].map(s => {
+                    if (newService.isFeatured && s.isFeatured) {
+                        return { ...s, isFeatured: false };
+                    }
+                    return s;
+                });
+                newServices.push(newService);
                 return {
                     services: newServices,
                     servicePromise: Promise.resolve(newServices),
-                    isLoading: false
                 };
             });
             return newService;
         } catch (error) {
-            set({ isLoading: false });
             throw new Error(getErrorMessage(error));
         }
     },
 
     updateService: async (id, serviceData) => {
-        set({ isLoading: true });
         try {
             const updatedService = await servicesService.updateService(id, serviceData);
             set((state) => {
-                const newServices = state.services.map(s => s._id === id ? updatedService : s);
+                const newServices = state.services.map(s => {
+                    if (s._id === id) return updatedService;
+                    if (updatedService.isFeatured && s.isFeatured) {
+                        return { ...s, isFeatured: false };
+                    }
+                    return s;
+                });
                 return {
                     services: newServices,
                     servicePromise: Promise.resolve(newServices),
-                    isLoading: false
                 };
             });
             return updatedService;
         } catch (error) {
-            set({ isLoading: false });
             throw new Error(getErrorMessage(error));
         }
     },
 
     deleteService: async (id) => {
-        set({ isLoading: true });
         try {
             await servicesService.deleteService(id);
             set((state) => {
@@ -88,11 +93,9 @@ export const createServiceSlice = (set, get) => ({
                 return {
                     services: newServices,
                     servicePromise: Promise.resolve(newServices),
-                    isLoading: false
                 };
             });
         } catch (error) {
-            set({ isLoading: false });
             throw new Error(getErrorMessage(error));
         }
     },

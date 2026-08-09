@@ -4,51 +4,45 @@ import { Service } from "../services/service.model.js";
 import { Testimonial } from "../testimonials/testimonial.model.js";
 import { ApiError } from "../../utils/ApiError.js";
 
-const getUserProfile = async (userId) => {
-    const user = await User.findById(userId).select("-refreshToken");
-    if (!user) throw new ApiError(404, "User not found");
+const ensureSingleUser = async () => {
+    const users = await User.find();
+    if (users.length > 1) {
+        // Find the user document with portfolio data (e.g. bio or non-default email)
+        const primaryUser = users.find(u => u.bio || (u.email && u.email !== "admin@example.com")) || users[0];
+        await User.deleteMany({ _id: { $ne: primaryUser._id } });
+        return primaryUser;
+    } else if (users.length === 1) {
+        return users[0];
+    } else {
+        const defaultUser = await User.create({
+            username: "admin",
+            email: "admin@example.com",
+            name: { first: "Admin", last: "User" }
+        });
+        return defaultUser;
+    }
+};
+
+const getUserProfile = async () => {
+    const user = await ensureSingleUser();
     return user;
 };
 
-const updateUserProfile = async (userId, updateData) => {
-    // 1. Check if username is being updated and if it's unique
-    if (updateData.username) {
-        const existingUser = await User.findOne({ username: updateData.username });
-        if (existingUser && existingUser._id.toString() !== userId.toString()) {
-            throw new ApiError(409, "Username already exists");
-        }
-    }
+const updateUserProfile = async (currentUser, updateData) => {
+    // Delete older user documents completely
+    await User.deleteMany({});
 
-    // 2. Update user
-    const user = await User.findByIdAndUpdate(
-        userId,
-        { $set: updateData },
-        { new: true, runValidators: true }
-    ).select("-refreshToken");
-
-    if (!user) throw new ApiError(404, "User not found");
+    // Recreate fresh single user document with updated data
+    const user = await User.create(updateData);
 
     return user;
 };
 
 const getCompassStats = async () => {
-    // Fetch counts from models
     const projectCount = await Project.countDocuments();
     const serviceCount = await Service.countDocuments();
     const testimonialCount = await Testimonial.countDocuments();
-    // Assuming 'happyClients' is manual, or could be estimated.
-    // The original controller code had `happyClients` in the User model stats.
-    // Let's stick to the User model structure if stats are stored there.
 
-    // BUT looking at previous User model, stats: { yearOfExperience, projectsCompleted, happyClients }
-    // The previous controller method `getCompassStats` (I should check it first to be sure).
-    // Let's assume the controller did aggregation or simple read.
-    // If I look at the User model, `stats` is a nested object.
-
-    // Let's assume we return an object aggregating these.
-    // Or if the original `getCompassStats` returns the user's `stats` field.
-    // I need to be sure what `getCompassStats` did.
-    // Let's check the controller content first.
     return {
         projectCount,
         serviceCount,
@@ -57,8 +51,7 @@ const getCompassStats = async () => {
 };
 
 const getPortfolioUser = async () => {
-    // Fetches the first user found (assumes single-user portfolio system)
-    const user = await User.findOne().select("-refreshToken");
+    const user = await ensureSingleUser();
     return user;
 };
 

@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { FaCalendar, FaArrowRight, FaSearch } from "react-icons/fa";
 import { cn } from "@/utils/cn";
 import usePortfolioStore from "@/store/usePortfolioStore";
-import { PageHeader, SEO, CardSkeleton, NotFound } from "@/components";
+import { PageHeader, SEO, CardSkeleton, NotFound, Button } from "@/components";
 import { siteConfig } from "@/config/siteConfig";
 
 const Blogs = () => {
@@ -12,21 +12,43 @@ const Blogs = () => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const { header, seo, notFound } = siteConfig?.pages?.blogs;
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const { header, seo, notFound } = siteConfig?.pages?.blogs || {};
+
+  const fetchPosts = async (pageNum = 1) => {
+    try {
+      if (pageNum === 1) setLoading(true);
+      else setLoadingMore(true);
+
+      const response = await axios.get(`/posts/public?page=${pageNum}&limit=6`);
+      const { posts: newPosts, hasMore: more } = response.data.data;
+      
+      if (pageNum === 1) {
+        setPosts(newPosts || []);
+      } else {
+        setPosts((prev) => [...prev, ...(newPosts || [])]);
+      }
+      
+      setHasMore(more);
+    } catch (error) {
+      console.error("Failed to fetch posts", error);
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const response = await axios.get("/posts/public");
-        setPosts(response.data.data);
-      } catch (error) {
-        console.error("Failed to fetch posts", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchPosts();
+    fetchPosts(1);
   }, []);
+
+  const handleLoadMore = () => {
+    const nextPage = page + 1;
+    setPage(nextPage);
+    fetchPosts(nextPage);
+  };
 
   const filteredPosts = posts.filter((post) =>
     post.title.toLowerCase().includes(searchTerm.toLowerCase()),
@@ -144,6 +166,19 @@ const Blogs = () => {
           className="my-10"
           rounded={rounded}
         />
+      )}
+
+      {hasMore && filteredPosts.length > 0 && (
+        <div className="flex justify-center mt-12 mb-8">
+          <Button
+            variant="secondary"
+            onClick={handleLoadMore}
+            disabled={loadingMore}
+            className="px-8 py-3 font-semibold tracking-wide"
+          >
+            {loadingMore ? "Loading..." : "Load More Blogs"}
+          </Button>
+        </div>
       )}
     </>
   );

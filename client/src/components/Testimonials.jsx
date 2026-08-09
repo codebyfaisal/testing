@@ -37,7 +37,8 @@ const Testimonials = () => {
 
   if (!testimonials || testimonials.length === 0) return null;
 
-  const currentTestimonial = testimonials[currentIndex];
+  const safeIndex = currentIndex >= testimonials.length ? 0 : currentIndex;
+  const currentTestimonial = testimonials[safeIndex];
 
   return (
     <section>
@@ -86,7 +87,7 @@ const Testimonials = () => {
 
           <div className="relative min-h-[inherit]">
             <div
-              key={currentIndex}
+              key={safeIndex}
               className="flex flex-col md:flex-row gap-8 items-center md:items-start text-left animate-fade-in"
             >
               {/* Left: Profile & Actions */}

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   PageHeader,
   SEO,
@@ -44,10 +44,13 @@ const SkeletonLoader = () => (
   </div>
 );
 
+const MAX_CUSTOM_TYPE_LENGTH = 40;
+
 const initialState = {
   name: "",
   email: "",
   type: "General",
+  customType: "",
   message: "",
 };
 
@@ -58,16 +61,37 @@ const Contact = () => {
     form: formConfig,
     info,
     connect,
-  } = siteConfig?.pages?.contact;
+  } = siteConfig?.pages?.contact || {};
   const { config, user, rounded, loading } = usePortfolioStore();
-  const messageTypes = config?.messageTypes || ["General", "Job", "Other"];
+  const rawMessageTypes = Array.isArray(config?.messageTypes)
+    ? config.messageTypes
+    : ["General", "Job", "Other"];
+  const messageTypes = rawMessageTypes.includes("Other")
+    ? rawMessageTypes
+    : [...rawMessageTypes, "Other"];
+
+  const socialEntries = useMemo(
+    () =>
+      user?.socialLinks
+        ? Object.entries(user.socialLinks).filter(([, url]) => Boolean(url))
+        : [],
+    [user?.socialLinks],
+  );
 
   const [formData, setFormData] = useState(initialState);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    if (name === "customType") {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: (value || "").slice(0, MAX_CUSTOM_TYPE_LENGTH),
+      }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -77,14 +101,25 @@ const Contact = () => {
       return;
     }
 
+    const customTopic = (formData.customType || "").trim();
+    if (formData.type === "Other" && !customTopic) {
+      toast.error("Please specify your custom topic.");
+      return;
+    }
+
     setIsSubmitting(true);
+    const finalType =
+      formData.type === "Other"
+        ? customTopic.slice(0, MAX_CUSTOM_TYPE_LENGTH) || "Other"
+        : formData.type;
+
     try {
       await portfolioService.sendMessage({
         from: formData.name,
         email: formData.email,
-        subject: formData.type || "General Inquiry",
+        subject: finalType || "General Inquiry",
         message: formData.message,
-        type: formData.type,
+        type: finalType,
       });
       toast.success("Message sent successfully!");
       setFormData(initialState);
@@ -167,24 +202,23 @@ const Contact = () => {
                   {info?.location}
                 </h2>
                 <p className="text-muted-foreground transition-colors duration-300">
-                  {user.location}
+                  {user.address}
                 </p>
               </div>
             </div>
 
-            <div className="pt-8 border-t border-border">
-              <h2 className="text-lg font-bold text-foreground mb-4 transition-colors duration-300">
-                {connect}
-              </h2>
-              <div className="flex gap-4">
-                {user?.socialLinks &&
-                  Object.entries(user?.socialLinks || {}).map(
-                    ([social, url]) => (
-                      <SocialIcons key={social} social={social} url={url} />
-                    ),
-                  )}
+            {socialEntries.length > 0 && (
+              <div className="pt-8 border-t border-border">
+                <h2 className="text-lg font-bold text-foreground mb-4 transition-colors duration-300">
+                  {connect}
+                </h2>
+                <div className="flex gap-4">
+                  {socialEntries.map(([social, url]) => (
+                    <SocialIcons key={social} social={social} url={url} />
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           {/* Contact Form */}
@@ -242,6 +276,24 @@ const Contact = () => {
                     ...messageTypes,
                   ]}
                 />
+              )}
+
+              {formData.type === "Other" && (
+                <div>
+                  <Input
+                    id="customType"
+                    name="customType"
+                    label="Custom Topic / Type"
+                    value={formData.customType || ""}
+                    onChange={handleChange}
+                    maxLength={MAX_CUSTOM_TYPE_LENGTH}
+                    placeholder={`Specify custom topic (max ${MAX_CUSTOM_TYPE_LENGTH} chars)`}
+                    required
+                  />
+                  <p className="text-xs text-muted-foreground mt-1 text-right">
+                    {(formData.customType || "").length}/{MAX_CUSTOM_TYPE_LENGTH} characters
+                  </p>
+                </div>
               )}
 
               <Textarea

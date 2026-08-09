@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import api from "@/api/axios";
 
 import usePortfolioStore from "@/store/usePortfolioStore";
 import { FaCode } from "react-icons/fa";
@@ -23,9 +24,30 @@ const SkeletonLoader = () => (
 );
 
 const Services = () => {
-  const { data, rounded, loading } = usePortfolioStore();
-  const servicesData = data?.services || [];
-  const plans = data?.plans || [];
+  const { rounded } = usePortfolioStore();
+  const [servicesData, setServicesData] = useState([]);
+  const [plans, setPlans] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchServicesPageData = async () => {
+      try {
+        setLoading(true);
+        const [servicesRes, plansRes] = await Promise.all([
+          api.get("/services"),
+          api.get("/services/plans"),
+        ]);
+        setServicesData(servicesRes.data?.data || []);
+        setPlans(plansRes.data?.data || []);
+      } catch (error) {
+        console.error("Failed to fetch services data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchServicesPageData();
+  }, []);
+
   const servicesConfig = siteConfig?.pages?.services;
   const headerConfig = servicesConfig?.header;
 

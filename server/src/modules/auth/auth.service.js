@@ -41,27 +41,20 @@ const checkAdminExists = async () => {
     return count > 0;
 };
 
-const loginUser = async (email, password) => {
-    const targetEmail = ADMIN_EMAIL || process.env.ADMIN_EMAIL || "admin@example.com";
+import { UserService } from "../user/user.service.js";
+
+const loginUser = async (password) => {
     const targetPassword = ADMIN_PASSWORD || process.env.ADMIN_PASSWORD || "admin123";
 
     const isMatch = targetPassword.startsWith("$2a$") || targetPassword.startsWith("$2b$")
         ? bcrypt.compareSync(password, targetPassword)
         : password === targetPassword;
 
-    if (email !== targetEmail || !isMatch) {
-        throw new ApiError(401, "Invalid email or password");
+    if (!isMatch) {
+        throw new ApiError(401, "Invalid password");
     }
 
-    let user = await User.findOne({ email: targetEmail });
-
-    if (!user) {
-        user = await User.create({
-            username: "admin",
-            email: targetEmail,
-            name: { first: "Admin", last: "User" }
-        });
-    }
+    const user = await UserService.getPortfolioUser();
 
     const { accessToken, refreshToken } = await generateAccessAndRefereshTokens(user._id);
     const loggedInUser = await User.findById(user._id).select("-refreshToken");

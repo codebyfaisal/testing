@@ -19,6 +19,7 @@ export { default as UnsavedChangesNotifier } from "./ui/UnsavedChangesNotifier";
 export { default as Layout } from "./layout/Layout";
 export { default as PageHeader } from "./layout/PageHeader";
 export { default as Sidebar } from "./layout/Sidebar";
+export { default as Header } from "./layout/Header";
 
 export { default as QuestionBuilder } from "./QuestionBuilder";
 

@@ -33,6 +33,28 @@ const usePortfolioStore = create((set) => ({
             set({ error: error.message, loading: false });
         }
     },
+
+    fetchHomeData: async () => {
+        set({ loading: true, error: null });
+        try {
+            const data = await portfolioService.getHomeData();
+            set({
+                data: {
+                    user: data.user,
+                    services: data.featuredService || [],
+                    projects: data.featuredProjects || [],
+                    testimonials: data.testimonials || [],
+                },
+                loading: false,
+                isRounded: data?.config?.appearance?.theme?.borderRadius || false,
+                rounded: data?.config?.appearance?.theme?.borderRadius ? "rounded-3xl" : "",
+                config: data?.config,
+                user: data?.user,
+            });
+        } catch (error) {
+            set({ error: error.message, loading: false });
+        }
+    },
 }));
 
 export default usePortfolioStore;

@@ -12,12 +12,11 @@ const checkAdminExists = asyncHandler(async (req, res) => {
 });
 
 const loginUser = asyncHandler(async (req, res) => {
-    const { email, password } = req.body;
+    const { password } = req.body;
 
-    if (!email) throw new ApiError(400, "email is required");
-    if (!password) throw new ApiError(400, "password is required");
+    if (!password) throw new ApiError(400, "Password is required");
 
-    const { user, accessToken, refreshToken } = await AuthService.loginUser(email, password);
+    const { user, accessToken, refreshToken } = await AuthService.loginUser(password);
 
     const options = {
         httpOnly: true,

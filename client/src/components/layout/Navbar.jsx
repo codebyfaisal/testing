@@ -7,7 +7,7 @@ import { siteConfig } from "@/config/siteConfig";
 import { RiMenu4Fill, RiMenuFill } from "react-icons/ri";
 
 const Navbar = () => {
-  const { user, isRounded, mobileMenuOpen, setMobileMenuOpen } =
+  const { user, isRounded, mobileMenuOpen, setMobileMenuOpen, config } =
     usePortfolioStore();
   const username = user?.username || siteConfig.navigation.brandFallback;
   const location = useLocation();
@@ -85,12 +85,14 @@ const Navbar = () => {
     setMobileMenuOpen(false);
   }, [location.pathname, setMobileMenuOpen]);
 
+  const showCareers = config?.navigation?.showCareers ?? true;
+
   const links = [
     { name: "About", path: "/about" },
     { name: "Services", path: "/services" },
     { name: "Projects", path: "/projects" },
     { name: "Blogs", path: "/blogs" },
-    { name: "Careers", path: "/careers" },
+    ...(showCareers ? [{ name: "Careers", path: "/careers" }] : []),
     { name: "Contact", path: "/contact" },
   ];
 

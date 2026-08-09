@@ -30,6 +30,15 @@ const getAllProjects = asyncHandler(async (req, res) => {
     );
 });
 
+const getPublicProjects = asyncHandler(async (req, res) => {
+    const { page = 1, limit = 6 } = req.query;
+    const { projects, total } = await ProjectService.getPublicProjects(page, limit);
+
+    return res.status(200).json(
+        new ApiResponse(200, { projects, hasMore: page * limit < total }, "Projects fetched successfully")
+    );
+});
+
 const getProjectById = asyncHandler(async (req, res) => {
     const { id } = req.params;
     const project = await ProjectService.getProjectById(id);
@@ -72,6 +81,7 @@ const deleteProject = asyncHandler(async (req, res) => {
 export {
     createProject,
     getAllProjects,
+    getPublicProjects,
     getProjectById,
     updateProject,
     deleteProject

@@ -35,6 +35,10 @@ const serviceSchema = new Schema({
     }],
     cta: {
         ...commonStr,
+    },
+    isFeatured: {
+        type: Boolean,
+        default: false
     }
 }, { timestamps: true });
 

@@ -33,11 +33,12 @@ const getPosts = asyncHandler(async (req, res) => {
 });
 
 const getPublicPosts = asyncHandler(async (req, res) => {
-    const { page = 1, limit = 10 } = req.query;
+    const { page = 1, limit = 6 } = req.query;
     const posts = await PostService.getPublicPosts(page, limit);
+    const total = await PostService.countPosts();
 
     res.status(200).json(
-        new ApiResponse(200, posts, "Published posts fetched successfully")
+        new ApiResponse(200, { posts, hasMore: page * limit < total }, "Published posts fetched successfully")
     );
 });
 

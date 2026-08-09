@@ -1,6 +1,16 @@
 import React, { useEffect, useState, useMemo } from "react";
 import useDashboardStore from "@/store/useDashboardStore";
-import { FaSave, FaImage, FaPalette, FaStar } from "react-icons/fa";
+import {
+  FaSave,
+  FaImage,
+  FaStar,
+  FaTools,
+  FaSlidersH,
+  FaUserCircle,
+  FaCommentDots,
+  FaCheckCircle,
+  FaExclamationTriangle,
+} from "react-icons/fa";
 import { useBlocker } from "react-router-dom";
 import {
   Button,
@@ -8,7 +18,6 @@ import {
   Textarea,
   ConfirmationModal,
   UnsavedChangesNotifier,
-  Select,
   PageHeader,
   FilePickerModal,
   Card,
@@ -28,17 +37,17 @@ const ImageSelectionField = ({ value, label, onSelect, onRemove }) => {
       )}
 
       {value ? (
-        <div className="relative w-full h-48 bg-muted/30 border border-border overflow-hidden rounded-lg group">
+        <div className="relative w-full h-48 bg-muted/30 border border-border overflow-hidden rounded-xl group">
           <img
             src={value}
             alt="Preview"
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
-          <div className="absolute inset-0 bg-background/80 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+          <div className="absolute inset-0 bg-background/80 opacity-0 group-hover:opacity-100 transition-all duration-200 flex items-center justify-center gap-3 backdrop-blur-xs">
             <Button
               onClick={onSelect}
               icon={<FaImage />}
-              label="Change"
+              label="Change Image"
               uiType="secondary"
               size="sm"
             />
@@ -52,11 +61,16 @@ const ImageSelectionField = ({ value, label, onSelect, onRemove }) => {
         </div>
       ) : (
         <div
-          className="relative w-full h-32 bg-muted/20 border border-dashed border-border flex flex-col items-center justify-center cursor-pointer hover:border-primary hover:bg-muted/30 transition-all rounded-lg"
+          className="relative w-full h-36 bg-muted/20 border border-dashed border-border flex flex-col items-center justify-center cursor-pointer hover:border-primary hover:bg-muted/40 transition-all rounded-xl group"
           onClick={onSelect}
         >
-          <FaImage className="text-3xl text-muted-foreground mb-2" />
-          <p className="text-sm text-muted-foreground">Select Image</p>
+          <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-2 group-hover:scale-110 transition-transform">
+            <FaImage className="text-xl" />
+          </div>
+          <p className="text-sm font-medium text-foreground">Select Image</p>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Click to choose from media manager
+          </p>
         </div>
       )}
     </div>
@@ -66,13 +80,15 @@ const ImageSelectionField = ({ value, label, onSelect, onRemove }) => {
 const Configuration = () => {
   const {
     config: storeConfig,
-    services,
     getConfig,
     updateConfig,
     fetchServices,
     isLoading,
     resetConfigState,
   } = useDashboardStore();
+
+  const [activeTab, setActiveTab] = useState("system");
+
   const [config, setConfig] = useState({
     appearance: {
       rounded: true,
@@ -86,11 +102,17 @@ const Configuration = () => {
     hero: { greeting: "", title: "", subTitle: "", image: "" },
     about: { title: "", description: "", image: "" },
     messageTypes: [],
-    featuredService: {
-      serviceId: "",
+    footer: {
       title: "",
-      image: "",
       description: "",
+    },
+    navigation: {
+      showCareers: true,
+    },
+    maintenance: {
+      enabled: false,
+      title: "",
+      message: "",
     },
   });
   const [isSaving, setIsSaving] = useState(false);
@@ -142,11 +164,17 @@ const Configuration = () => {
         },
         about: storeConfig.about || { title: "", description: "", image: "" },
         messageTypes: storeConfig.messageTypes || [],
-        featuredService: storeConfig.featuredService || {
-          serviceId: "",
+        footer: storeConfig.footer || {
           title: "",
-          image: "",
           description: "",
+        },
+        navigation: {
+          showCareers: storeConfig.navigation?.showCareers ?? true,
+        },
+        maintenance: {
+          enabled: storeConfig.maintenance?.enabled ?? false,
+          title: storeConfig.maintenance?.title || "",
+          message: storeConfig.maintenance?.message || "",
         },
       };
       setConfig(loadedConfig);
@@ -163,7 +191,7 @@ const Configuration = () => {
   // Block navigation if dirty
   const blocker = useBlocker(
     ({ currentLocation, nextLocation }) =>
-      isDirty && currentLocation.pathname !== nextLocation.pathname
+      isDirty && currentLocation.pathname !== nextLocation.pathname,
   );
 
   useEffect(() => {
@@ -206,6 +234,26 @@ const Configuration = () => {
     }));
   };
 
+  const handleNavigationToggle = (field) => {
+    setConfig((prev) => ({
+      ...prev,
+      navigation: {
+        ...prev.navigation,
+        [field]: !prev.navigation?.[field],
+      },
+    }));
+  };
+
+  const handleMaintenanceToggle = () => {
+    setConfig((prev) => ({
+      ...prev,
+      maintenance: {
+        ...prev.maintenance,
+        enabled: !prev.maintenance?.enabled,
+      },
+    }));
+  };
+
   const handleThemeToggle = () => {
     setConfig((prev) => ({
       ...prev,
@@ -235,6 +283,8 @@ const Configuration = () => {
             borderRadius: config.appearance.rounded,
           },
         },
+        navigation: config.navigation,
+        maintenance: config.maintenance,
       };
 
       await updateConfig(payload);
@@ -262,227 +312,349 @@ const Configuration = () => {
     if (blocker.state === "blocked") blocker.proceed();
   };
 
+  const tabs = [
+    { id: "system", label: "System & Theme", icon: FaSlidersH },
+    { id: "hero", label: "Hero Section", icon: FaImage },
+    { id: "about", label: "About Section", icon: FaUserCircle },
+    { id: "footer", label: "Footer & Categories", icon: FaCommentDots },
+  ];
+
   return (
-    <div className="h-[calc(100vh-2rem)] flex flex-col space-y-4">
+    <div className="space-y-4">
+      <style>
+        {`
+          input[type="color"] {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 6px;
+            overflow: hidden;
+            cursor: pointer;
+          }
+          input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0;
+          }
+          input[type="color"]::-webkit-color-swatch {
+            border: none;
+            border-radius: 6px;
+          }
+          input[type="color"]::-moz-color-swatch {
+            border: none;
+            border-radius: 6px;
+          }
+          `}
+      </style>
+
       <PageHeader
-        title="Configuration"
-        description="Customize the appearance and content of your portfolio."
-      />
+        title="System Configuration"
+        description="Manage global settings, maintenance mode, themes, and page content."
+      >
+        <div className="flex flex-wrap items-center gap-2">
+          {config.maintenance?.enabled ? (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 text-xs font-semibold">
+              <FaExclamationTriangle className="text-amber-500" /> Maintenance Active
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-semibold">
+              <FaCheckCircle className="text-emerald-500" /> Live Mode
+            </span>
+          )}
+        </div>
+      </PageHeader>
 
-      <div className="flex-1 overflow-y-auto min-h-0 pr-1 space-y-8">
-        {/* Appearance */}
-        <Card className="space-y-6">
-          <h3 className="text-xl font-bold text-foreground mb-6 flex items-center gap-2">
-            <FaPalette className="text-primary" /> Appearance
-          </h3>
+      {/* Section Navigation Tabs */}
+      <div className="flex items-center gap-2 border-b border-border overflow-x-auto pb-3 shrink-0">
+        {tabs.map((tab) => {
+          const Icon = tab.icon;
+          const isActive = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`inline-flex items-center gap-2.5 px-5 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 cursor-pointer text-nowrap ${
+                isActive
+                  ? "bg-primary text-primary-foreground shadow-md"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+              }`}
+            >
+              <Icon className="text-base" />
+              <span>{tab.label}</span>
+            </button>
+          );
+        })}
+      </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <Card className="flex justify-between">
-              <div>
-                <h4 className="font-medium text-foreground">Rounded UI</h4>
-                <p className="text-sm text-muted-foreground">
-                  Use rounded corners for elements
-                </p>
-              </div>
-              <Switch
-                checked={config.appearance.rounded}
-                onChange={() => handleToggle("rounded")}
-              />
-            </Card>
-
-            <Card className="col-span-1 lg:col-span-2 space-y-4">
+      <div className="space-y-8 pb-12">
+        {/* Tab 1: System & Theme */}
+        {activeTab === "system" && (
+          <div className="space-y-6">
+            {/* Maintenance Mode Card */}
+            <Card className="space-y-6 border-amber-500/30 bg-amber-500/5">
               <div className="flex items-center justify-between">
-                <div>
-                  <h4 className="font-medium text-foreground">Custom Theme</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Enable custom colors for your portfolio
-                  </p>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-amber-500/10 text-amber-500 flex items-center justify-center text-lg">
+                    <FaTools />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-foreground">
+                      Maintenance Mode
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      Display a Maintenance screen to visitors while updating
+                      your site
+                    </p>
+                  </div>
                 </div>
                 <Switch
-                  checked={config.appearance.theme.isCustom}
-                  onChange={handleThemeToggle}
+                  checked={config.maintenance?.enabled ?? false}
+                  onChange={handleMaintenanceToggle}
                 />
               </div>
 
-              <div
-                className={`transition-all duration-300 ${
-                  config.appearance.theme.isCustom
-                    ? "opacity-100 max-h-[500px]"
-                    : "opacity-50 max-h-screen grayscale pointer-events-none"
-                }`}
-              >
-                <label className="text-xs text-muted-foreground">
-                  Secondary (Accent)
-                </label>
-                <div className="flex gap-2">
-                  <input
-                    type="color"
-                    value={
-                      config.appearance.theme.colors.secondary || "#ffffff"
-                    }
-                    onChange={(e) =>
-                      handleColorChange("secondary", e.target.value)
-                    }
-                    className="w-10 h-10 rounded cursor-pointer bg-transparent border-none"
-                  />
+              {config.maintenance?.enabled && (
+                <div className="space-y-4 pt-4 border-t border-amber-500/20 animate-fadeIn">
                   <Input
-                    value={
-                      config.appearance.theme.colors.secondary || "#ffffff"
-                    }
+                    label="Custom Maintenance Title"
+                    value={config.maintenance.title}
                     onChange={(e) =>
-                      handleColorChange("secondary", e.target.value)
+                      handleChange("maintenance", "title", e.target.value)
                     }
-                    placeholder="#ffffff"
-                    className="flex-1"
+                    placeholder="e.g. System Under Maintenance"
+                  />
+                  <Textarea
+                    label="Custom Maintenance Message"
+                    value={config.maintenance.message}
+                    onChange={(e) =>
+                      handleChange("maintenance", "message", e.target.value)
+                    }
+                    rows={3}
+                    placeholder="e.g. We are performing scheduled upgrades. We will be back online shortly!"
                   />
                 </div>
-              </div>
+              )}
             </Card>
-          </div>
-        </Card>
 
-        {/* Hero & About Row */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Hero Section */}
-          <Card>
-            <h3 className="text-xl font-bold text-foreground mb-6 flex items-center gap-2">
-              <FaImage className="text-primary" /> Hero Section
+            {/* Navigation & Theme Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* Careers Tab Toggle */}
+              <Card className="flex flex-col justify-between space-y-4">
+                <div>
+                  <h4 className="font-bold text-foreground text-base mb-1">
+                    Navbar Careers Link
+                  </h4>
+                  <p className="text-sm text-muted-foreground">
+                    Show or hide the Careers tab in the website navbar
+                  </p>
+                </div>
+                <div className="flex items-center justify-between pt-2">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    {config.navigation?.showCareers ? "Visible" : "Hidden"}
+                  </span>
+                  <Switch
+                    checked={config.navigation?.showCareers ?? true}
+                    onChange={() => handleNavigationToggle("showCareers")}
+                  />
+                </div>
+              </Card>
+
+              {/* Rounded UI Toggle */}
+              <Card className="flex flex-col justify-between space-y-4">
+                <div>
+                  <h4 className="font-bold text-foreground text-base mb-1">
+                    Rounded UI Radius
+                  </h4>
+                  <p className="text-sm text-muted-foreground">
+                    Enable modern rounded corners across all portfolio cards
+                  </p>
+                </div>
+                <div className="flex items-center justify-between pt-2">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    {config.appearance?.rounded ? "Rounded" : "Sharp"}
+                  </span>
+                  <Switch
+                    checked={config.appearance?.rounded ?? true}
+                    onChange={() => handleToggle("rounded")}
+                  />
+                </div>
+              </Card>
+
+              {/* Custom Accent Color Picker */}
+              <Card className="flex flex-col justify-between space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-bold text-foreground text-base">
+                      Custom Accent Color
+                    </h4>
+                    <p className="text-xs text-muted-foreground">
+                      Override primary theme color
+                    </p>
+                  </div>
+                  <Switch
+                    checked={config.appearance?.theme?.isCustom ?? false}
+                    onChange={handleThemeToggle}
+                  />
+                </div>
+
+                <div
+                  className={`transition-all duration-300 ${
+                    config.appearance?.theme?.isCustom
+                      ? "opacity-100"
+                      : "opacity-40 grayscale pointer-events-none"
+                  }`}
+                >
+                  <div className="flex gap-2 relative items-center">
+                    <Input
+                      value={
+                        config.appearance?.theme?.colors?.secondary || "#ffffff"
+                      }
+                      onChange={(e) =>
+                        handleColorChange("secondary", e.target.value)
+                      }
+                      placeholder="#ffffff"
+                      className="flex-1 pr-12"
+                    />
+                    <input
+                      type="color"
+                      value={
+                        config.appearance?.theme?.colors?.secondary || "#ffffff"
+                      }
+                      onChange={(e) =>
+                        handleColorChange("secondary", e.target.value)
+                      }
+                      className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer"
+                    />
+                  </div>
+                </div>
+              </Card>
+            </div>
+          </div>
+        )}
+
+        {/* Tab 2: Hero Section */}
+        {activeTab === "hero" && (
+          <Card className="space-y-6">
+            <h3 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2">
+              <FaImage className="text-primary" /> Hero Section Settings
             </h3>
-            <div className="space-y-3">
+            <div className="space-y-4">
               <ImageSelectionField
-                label="Hero Image"
+                label="Hero Background / Character Image"
                 value={config.hero.image}
                 onSelect={() => handleOpenPicker("hero", "image")}
                 onRemove={() => handleChange("hero", "image", "")}
               />
-
-              <Input
-                label="Greeting"
-                value={config.hero.greeting}
-                onChange={(e) =>
-                  handleChange("hero", "greeting", e.target.value)
-                }
-                placeholder="e.g. Hello, I'm"
-              />
-              <Input
-                label="Title / Name"
-                value={config.hero.title}
-                onChange={(e) => handleChange("hero", "title", e.target.value)}
-                placeholder="e.g. Hello, I'm..."
-              />
-              <Input
-                label="Role / Subtitle"
-                value={config.hero.subTitle}
-                onChange={(e) =>
-                  handleChange("hero", "subTitle", e.target.value)
-                }
-                placeholder="e.g. Full Stack Developer"
-              />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <Input
+                  label="Greeting Text"
+                  value={config.hero.greeting}
+                  onChange={(e) =>
+                    handleChange("hero", "greeting", e.target.value)
+                  }
+                  placeholder="e.g. Hello, I'm"
+                />
+                <Input
+                  label="Main Title / Name"
+                  value={config.hero.title}
+                  onChange={(e) =>
+                    handleChange("hero", "title", e.target.value)
+                  }
+                  placeholder="e.g. Faisal Khan"
+                />
+                <Input
+                  label="Subtitle / Primary Role"
+                  value={config.hero.subTitle}
+                  onChange={(e) =>
+                    handleChange("hero", "subTitle", e.target.value)
+                  }
+                  placeholder="e.g. Full Stack Developer"
+                  className="col-span-full"
+                />
+              </div>
             </div>
           </Card>
+        )}
 
-          {/* About Section */}
-          <Card>
-            <h3 className="text-xl font-bold text-foreground mb-6 flex items-center gap-2">
-              <FaImage className="text-primary" /> About Section
+        {/* Tab 3: About Section */}
+        {activeTab === "about" && (
+          <Card className="space-y-6">
+            <h3 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2">
+              <FaUserCircle className="text-primary" /> About Section Settings
             </h3>
-            <div className="space-y-3">
+            <div className="space-y-4">
               <ImageSelectionField
-                label="About Image"
+                label="About Section Portrait Image"
                 value={config.about.image}
                 onSelect={() => handleOpenPicker("about", "image")}
                 onRemove={() => handleChange("about", "image", "")}
               />
               <Input
-                label="Heading"
+                label="Section Heading"
                 value={config.about.title}
                 onChange={(e) => handleChange("about", "title", e.target.value)}
-              />
-              <div className="space-y-2">
-                <Textarea
-                  value={config.about.description}
-                  onChange={(e) =>
-                    handleChange("about", "description", e.target.value)
-                  }
-                  rows={4}
-                  placeholder="e.g. I'm a passionate developer with a strong background in full stack development."
-                  label="Description"
-                />
-              </div>
-            </div>
-          </Card>
-        </div>
-
-        {/* Service & Messages Row */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Featured Service */}
-          <Card>
-            <h3 className="text-xl font-bold text-foreground mb-6 flex items-center gap-2">
-              <FaStar className="text-yellow-500" /> Featured Service
-            </h3>
-
-            <div className="space-y-3">
-              <Select
-                label="Select Service"
-                value={config.featuredService.serviceId}
-                onChange={(value) =>
-                  handleChange("featuredService", "serviceId", value)
-                }
-                options={[
-                  { value: "", label: "Select a service..." },
-                  ...(services || []).map((s) => ({
-                    label: s.title,
-                    value: s._id,
-                  })),
-                ]}
-              />
-              <Input
-                label="Custom Title (Optional)"
-                value={config.featuredService.title}
-                onChange={(e) =>
-                  handleChange("featuredService", "title", e.target.value)
-                }
-                placeholder="Override service title for display"
+                placeholder="e.g. Building digital products with passion"
               />
               <Textarea
-                label="Custom Description (Optional)"
-                value={config.featuredService.description}
+                label="Detailed Description"
+                value={config.about.description}
                 onChange={(e) =>
-                  handleChange("featuredService", "description", e.target.value)
+                  handleChange("about", "description", e.target.value)
                 }
-                rows={3}
-                placeholder="Override service description for display"
+                rows={5}
+                placeholder="Write your main bio or about description..."
               />
-              <ImageSelectionField
-                label="Custom Cover Image (Optional)"
-                value={config.featuredService.image}
-                onSelect={() => handleOpenPicker("featuredService", "image")}
-                onRemove={() => handleChange("featuredService", "image", "")}
-              />
-              <p className="text-xs text-muted-foreground mt-2">
-                Overrides the service's default icon/image
-              </p>
             </div>
           </Card>
+        )}
 
-          {/* Message Types */}
-          <ConfigMessageTypes
-            messageTypes={config.messageTypes}
-            onChange={handleMessageTypesChange}
-          />
-        </div>
+        {/* Tab 4: Footer & Message Categories */}
+        {activeTab === "footer" && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <Card className="space-y-4">
+              <h3 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2">
+                <FaStar className="text-amber-400" /> Footer Call-To-Action
+                (CTA)
+              </h3>
+              <Input
+                label="CTA Title"
+                value={config.footer.title}
+                onChange={(e) =>
+                  handleChange("footer", "title", e.target.value)
+                }
+                placeholder="e.g. Ready to build something amazing?"
+              />
+              <Textarea
+                label="CTA Description"
+                value={config.footer.description}
+                onChange={(e) =>
+                  handleChange("footer", "description", e.target.value)
+                }
+                rows={4}
+                placeholder="Let's turn your ideas into reality..."
+              />
+            </Card>
 
-        <div className="flex justify-end sticky bottom-0 right-0 z-50">
+            <ConfigMessageTypes
+              messageTypes={config.messageTypes}
+              onChange={handleMessageTypesChange}
+            />
+          </div>
+        )}
+
+        {/* Save Bar */}
+        <div className="flex justify-end sticky bottom-0 right-0 z-50 pt-4">
           <Button
             onClick={handleSave}
             uiType="primary"
             icon={<FaSave />}
-            label={isSaving ? "Saving..." : "Save Changes"}
+            label={isSaving ? "Saving Configuration..." : "Save Configuration"}
             disabled={!isDirty || isSaving}
-            className={`px-8 py-3 font-semibold ${
+            className={`px-8 py-3 font-semibold shadow-xl backdrop-blur-md ${
               !isDirty
                 ? "bg-muted text-muted-foreground cursor-not-allowed border border-border"
-                : ""
+                : "bg-primary text-primary-foreground hover:opacity-90"
             }`}
           />
         </div>
@@ -508,8 +680,8 @@ const Configuration = () => {
           }
           message={
             blocker.state === "blocked"
-              ? "You have unsaved changes. Do you want to save them before leaving?"
-              : "Are you sure you want to update your settings?"
+              ? "You have unsaved configuration changes. Do you want to save them before leaving?"
+              : "Are you sure you want to update your portfolio configuration?"
           }
           confirmText="Save & Continue"
           cancelText={

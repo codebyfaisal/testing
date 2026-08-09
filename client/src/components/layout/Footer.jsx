@@ -9,7 +9,7 @@ import { cn } from "@/utils/cn";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
-  const { user } = usePortfolioStore();
+  const { user, config } = usePortfolioStore();
   const { theme } = useTheme();
 
   return (
@@ -22,12 +22,10 @@ const Footer = () => {
         {/* Main CTA Section */}
         <div className="flex flex-col items-center text-center">
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 bg-linear-to-b from-foreground to-foreground/50 bg-clip-text text-transparent py-3">
-            Ready to build something amazing?
+            {config?.footer?.title || "Ready to build something amazing?"}
           </h2>
           <p className="text-xl text-muted-foreground mb-10 max-w-2xl">
-            Let's turn your ideas into reality. Whether you need a stunning
-            website, a complex web application, or expert consultation, I'm here
-            to help.
+            {config?.footer?.description || "Let's turn your ideas into reality. Whether you need a stunning website, a complex web application, or expert consultation, I'm here to help."}
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <Button

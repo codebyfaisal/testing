@@ -82,11 +82,8 @@ const Overview = () => {
   };
 
   return (
-    <div className="h-[calc(100vh-2rem)] flex flex-col space-y-4">
-      <PageHeader
-        title={`Welcome back, ${user?.name?.first || "User"}`}
-        description="Here's what's happening with your portfolio today."
-      />
+    <div>
+      <PageHeader title="Overview" description="Here's what's happening with your portfolio today." />
 
       {isLoadingOverview ? (
         <OverviewSkeleton />
@@ -99,7 +96,7 @@ const Overview = () => {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="flex-1 overflow-y-auto min-h-0 pr-1"
+          className="space-y-6"
         >
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">

@@ -1,14 +1,14 @@
 import React, { Suspense } from "react";
 import { Outlet } from "react-router-dom";
 import { Sidebar } from "@/components";
-
+import Header from "./Header";
 import useDashboardStore from "@/store/useDashboardStore";
 
 const Layout = () => {
   const { isSidebarOpen, closeSidebar } = useDashboardStore();
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex">
+    <div className="h-screen w-screen overflow-hidden bg-background text-foreground flex">
       {/* Overlay for mobile */}
       {isSidebarOpen && (
         <div
@@ -17,18 +17,25 @@ const Layout = () => {
         />
       )}
 
-      {/* Sidebar - Passed props for mobile control */}
+      {/* Sidebar (Fixed 260px left) */}
       <Sidebar />
 
-      <main className="flex-1 w-full lg:ml-64 px-3 xs:px-4 lg:px-8 overflow-y-auto h-screen transition-all duration-300 y-16 py-6 content1">
-        <div className="max-w-6xl mx-auto content2">
-          <Suspense
-            fallback={<div className="text-muted-foreground">Loading...</div>}
-          >
-            <Outlet />
-          </Suspense>
-        </div>
-      </main>
+      {/* Right Area */}
+      <div className="flex-1 lg:ml-64 h-screen flex flex-col overflow-hidden w-full min-w-0">
+        {/* Fixed Top Header */}
+        <Header />
+
+        {/* Scrollable Content Area (flex: 1, overflow-y: auto) */}
+        <main className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-7 py-6">
+          <div className="max-w-6xl mx-auto">
+            <Suspense
+              fallback={<div className="text-muted-foreground p-4">Loading...</div>}
+            >
+              <Outlet />
+            </Suspense>
+          </div>
+        </main>
+      </div>
     </div>
   );
 };

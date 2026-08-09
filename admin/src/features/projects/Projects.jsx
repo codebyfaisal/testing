@@ -100,7 +100,7 @@ const Projects = () => {
   };
 
   return (
-    <div className="h-[calc(100vh-2rem)] flex flex-col space-y-4">
+    <div>
       <PageHeader
         title="Projects"
         description="Manage your portfolio projects."
@@ -121,30 +121,30 @@ const Projects = () => {
         </div>
       </PageHeader>
 
-      <div className="flex-1 overflow-y-auto min-h-0 pr-1">
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-          {isLoading ? (
-            <ProjectSkeleton />
-          ) : !projects || projects.length === 0 ? (
-            <NotFound
-              Icon={FaProjectDiagram}
-              message="No projects created yet."
-              className="w-full h-full flex flex-col items-center justify-center text-muted-foreground"
-            />
-          ) : !filteredProjects || filteredProjects.length === 0 ? (
-            <NotFound
-              Icon={FaProjectDiagram}
-              message="No projects found matching your criteria."
-              className="w-full h-full flex flex-col items-center justify-center text-muted-foreground"
-            />
-          ) : (
-            <ProjectList
-              projects={filteredProjects}
-              onEdit={handleOpenModal}
-              onDelete={handleDelete}
-            />
-          )}
-        </div>
+      <div className="space-y-6">
+        {!isLoading && (!projects || projects.length === 0) ? (
+          <NotFound
+            Icon={FaProjectDiagram}
+            message="No projects created yet."
+          />
+        ) : !isLoading && (!filteredProjects || filteredProjects.length === 0) ? (
+          <NotFound
+            Icon={FaProjectDiagram}
+            message="No projects found matching your criteria."
+          />
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+            {isLoading ? (
+              <ProjectSkeleton />
+            ) : (
+              <ProjectList
+                projects={filteredProjects}
+                onEdit={handleOpenModal}
+                onDelete={handleDelete}
+              />
+            )}
+          </div>
+        )}
       </div>
 
       {isModalOpen && (

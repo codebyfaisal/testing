@@ -2,6 +2,9 @@ import { Service } from "./service.model.js";
 import { ApiError } from "../../utils/ApiError.js";
 
 const createService = async (data) => {
+    if (data.isFeatured) {
+        await Service.updateMany({}, { $set: { isFeatured: false } });
+    }
     return await Service.create(data);
 };
 
@@ -16,6 +19,9 @@ const getServiceById = async (id) => {
 };
 
 const updateService = async (id, data) => {
+    if (data.isFeatured) {
+        await Service.updateMany({ _id: { $ne: id } }, { $set: { isFeatured: false } });
+    }
     const service = await Service.findByIdAndUpdate(
         id,
         { $set: data },

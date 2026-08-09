@@ -140,7 +140,7 @@ const JobApplications = () => {
   };
 
   return (
-    <div className="h-[calc(100vh-2rem)] flex flex-col space-y-4">
+    <div>
       <PageHeader
         title="Applications"
         description="Review applications for your job postings."
@@ -155,7 +155,7 @@ const JobApplications = () => {
         }
       />
 
-      <div className="flex-1 overflow-y-auto min-h-0 pr-1 space-y-6">
+      <div className="space-y-4">
         {!isApplicationsLoading &&
         (!filteredApplications || filteredApplications.length === 0) ? (
           filters.search ||

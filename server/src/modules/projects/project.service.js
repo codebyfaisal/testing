@@ -9,6 +9,15 @@ const getAllProjects = async () => {
     return await Project.find();
 };
 
+const getPublicProjects = async (page = 1, limit = 10) => {
+    const projects = await Project.find()
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * limit)
+        .limit(Number(limit));
+    const total = await Project.countDocuments();
+    return { projects, total };
+};
+
 const getProjectById = async (id) => {
     const project = await Project.findById(id);
     if (!project) throw new ApiError(404, "Project not found");
@@ -40,6 +49,7 @@ const countProjects = async () => {
 export const ProjectService = {
     createProject,
     getAllProjects,
+    getPublicProjects,
     getProjectById,
     updateProject,
     deleteProject,

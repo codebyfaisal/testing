@@ -25,11 +25,17 @@ const configSchema = new Schema({
             borderRadius: { type: Boolean, trim: true },
         },
     },
-    featuredService: {
-        serviceId: { type: String, trim: true },
+    footer: {
         title: { type: String, trim: true },
-        image: { type: String, trim: true },
         description: { type: String, trim: true }
+    },
+    navigation: {
+        showCareers: { type: Boolean, default: true }
+    },
+    maintenance: {
+        enabled: { type: Boolean, default: false },
+        title: { type: String, trim: true },
+        message: { type: String, trim: true }
     }
 }, { timestamps: true });
 

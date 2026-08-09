@@ -73,7 +73,7 @@ const Subscribers = () => {
   };
 
   return (
-    <div className="h-[calc(100vh-2rem)] flex flex-col space-y-4">
+    <div>
       <PageHeader
         title="Subscribers"
         description="Manage your newsletter subscribers."
@@ -87,7 +87,7 @@ const Subscribers = () => {
         }
       />
 
-      <div className="flex-1 overflow-y-auto min-h-0 pr-1">
+      <div className="space-y-6">
         <SubscriberList
           subscribers={filteredSubscribers}
           isLoading={loading}

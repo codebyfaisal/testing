@@ -40,6 +40,16 @@ const portfolioService = {
         }
     },
 
+    getHomeData: async () => {
+        try {
+            const response = await api.get("/users/portfolio/home");
+            return response.data.data;
+        } catch (error) {
+            console.error("Error fetching home data:", error);
+            return null;
+        }
+    },
+
     sendMessage: async (messageData) => {
         const response = await api.post("/messages", messageData);
         return response.data;

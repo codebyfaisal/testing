@@ -123,7 +123,7 @@ const Messages = () => {
   };
 
   return (
-    <div className="h-[calc(100vh-2rem)] flex flex-col space-y-4">
+    <div>
       <PageHeader
         title="Messages"
         description="View and manage your incoming messages."
@@ -137,19 +137,15 @@ const Messages = () => {
         }
       />
 
-      <div className="flex-1 overflow-y-auto min-h-0 pr-1">
+      <div className="space-y-6">
         {!isLoading && (!messages || messages.length === 0) ? (
-          <div className="flex justify-center h-full items-center">
-            <NotFound Icon={FaEnvelope} message="No messages received yet." />
-          </div>
+          <NotFound Icon={FaEnvelope} message="No messages received yet." />
         ) : !isLoading &&
           (!filteredMessages || filteredMessages.length === 0) ? (
-          <div className="flex justify-center h-full items-center">
-            <NotFound
-              Icon={FaEnvelope}
-              message="No messages found matching criteria."
-            />
-          </div>
+          <NotFound
+            Icon={FaEnvelope}
+            message="No messages found matching criteria."
+          />
         ) : (
           <MessageList
             messages={filteredMessages}

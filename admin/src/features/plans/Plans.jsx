@@ -49,7 +49,7 @@ const Plans = () => {
   };
 
   return (
-    <div className="h-[calc(100vh-2rem)] flex flex-col space-y-4">
+    <div>
       <PageHeader
         title="Plans"
         description="Manage your pricing plans and features."
@@ -64,24 +64,25 @@ const Plans = () => {
         }
       />
 
-      <div className="flex-1 overflow-y-auto min-h-0 pr-1">
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-          {isLoading ? (
-            <PlanSkeleton />
-          ) : !plans || plans.length === 0 ? (
-            <NotFound
-              Icon={FaMoneyBill}
-              message="No plans created yet."
-              className="w-full h-full flex flex-col items-center justify-center"
-            />
-          ) : (
-            <PlanList
-              plans={plans}
-              onEdit={handleOpenModal}
-              onDelete={handleDelete}
-            />
-          )}
-        </div>
+      <div className="space-y-6">
+        {!isLoading && (!plans || plans.length === 0) ? (
+          <NotFound
+            Icon={FaMoneyBill}
+            message="No plans created yet."
+          />
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+            {isLoading ? (
+              <PlanSkeleton />
+            ) : (
+              <PlanList
+                plans={plans}
+                onEdit={handleOpenModal}
+                onDelete={handleDelete}
+              />
+            )}
+          </div>
+        )}
       </div>
 
       {isModalOpen && (

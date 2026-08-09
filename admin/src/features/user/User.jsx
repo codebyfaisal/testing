@@ -163,13 +163,13 @@ const User = () => {
   ).length;
 
   return (
-    <div className="h-screen flex flex-col space-y-4">
+    <div>
       <PageHeader
         title="Profile"
         description="Manage your personal information, stats, and portfolio settings."
       />
       {user ? (
-        <div className="flex-1 overflow-y-auto min-h-0 pr-1 space-y-6 content4 relative pb-20">
+        <div className="space-y-6 relative pb-20">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Profile Card & Media - Standard Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">

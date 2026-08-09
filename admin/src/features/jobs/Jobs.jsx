@@ -31,7 +31,7 @@ const Jobs = () => {
   };
 
   return (
-    <div className="h-[calc(100vh-2rem)] flex flex-col space-y-4">
+    <div>
       <PageHeader
         title="Jobs"
         description="Manage your job postings and openings."
@@ -47,26 +47,28 @@ const Jobs = () => {
         />
       </PageHeader>
 
-      <div className="flex-1 overflow-y-auto min-h-0 pr-1">
-        <div className="grid grid-cols-1 gap-4">
-          {isLoading ? (
-            <JobSkeleton />
-          ) : !jobs || jobs.length === 0 ? (
-            <NotFound
-              Icon={FaBriefcase}
-              message="No job postings created yet."
-            />
-          ) : (
-            <JobList
-              jobs={jobs}
-              onEdit={(job) => {
-                setJobToEdit(job);
-                setIsFormOpen(true);
-              }}
-              onDelete={setDeleteId}
-            />
-          )}
-        </div>
+      <div className="space-y-6">
+        {!isLoading && (!jobs || jobs.length === 0) ? (
+          <NotFound
+            Icon={FaBriefcase}
+            message="No job postings created yet."
+          />
+        ) : (
+          <div className="grid grid-cols-1 gap-4">
+            {isLoading ? (
+              <JobSkeleton />
+            ) : (
+              <JobList
+                jobs={jobs}
+                onEdit={(job) => {
+                  setJobToEdit(job);
+                  setIsFormOpen(true);
+                }}
+                onDelete={setDeleteId}
+              />
+            )}
+          </div>
+        )}
       </div>
 
       <JobForm

@@ -3,12 +3,12 @@ import useDashboardStore from "@/store/useDashboardStore";
 import { useNavigate } from "react-router-dom";
 import { Input, Button, Card } from "@/components";
 import { FaSignInAlt } from "react-icons/fa";
+import toast from "react-hot-toast";
 
 const Login = () => {
-  const { login, isLoading, error } = useDashboardStore();
+  const { login, isLoadingAuth, authError } = useDashboardStore();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    email: "",
     password: "",
   });
 
@@ -16,9 +16,10 @@ const Login = () => {
     e.preventDefault();
     try {
       await login(formData);
+      toast.success("Welcome back!");
       navigate("/");
     } catch (err) {
-      // Error is handled in store
+      toast.error(err.message || "Invalid password");
     }
   };
 
@@ -29,44 +30,36 @@ const Login = () => {
           Welcome Back
         </h1>
         <p className="text-muted-foreground mb-6">
-          Sign in to manage your portfolio.
+          Enter your admin password to manage your portfolio.
         </p>
 
-        {error && (
+        {authError && (
           <div className="bg-destructive/10 border border-destructive/20 text-destructive p-3 rounded-lg mb-6 text-sm">
-            {error}
+            {authError}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <Input
-            label="Email Address"
-            type="email"
-            value={formData.email}
-            onChange={(e) =>
-              setFormData({ ...formData, email: e.target.value })
-            }
-            required
-            placeholder="admin@example.com"
-          />
-          <Input
-            label="Password"
+            label="Admin Password"
             type="password"
             value={formData.password}
             onChange={(e) =>
-              setFormData({ ...formData, password: e.target.value })
+              setFormData({ password: e.target.value })
             }
             required
+            disabled={isLoadingAuth}
             placeholder="••••••••"
           />
 
           <Button
             type="submit"
             uiType="primary"
-            disabled={isLoading}
-            loading={isLoading}
+            disabled={isLoadingAuth}
+            loading={isLoadingAuth}
             icon={<FaSignInAlt size={12} />}
-            label={isLoading ? "Signing in..." : "Sign In"}
+            label={isLoadingAuth ? "Verifying Password..." : "Sign In"}
+            className="w-full"
           />
         </form>
       </Card>

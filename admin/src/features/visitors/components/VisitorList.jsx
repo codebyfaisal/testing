@@ -143,7 +143,7 @@ const VisitorList = ({
               </motion.div>
             ))
           ) : (
-            <div className="p-12 text-center text-muted-foreground flex flex-col items-center justify-center h-full">
+            <div className="p-12 text-center text-muted-foreground flex flex-col items-center justify-center h-full bg-card border border-border rounded-b-xl overflow-hidden">
               <FaGlobe className="mb-2 text-2xl opacity-20" />
               <p>No visits found matching your filters.</p>
             </div>

@@ -150,7 +150,7 @@ const Forms = () => {
   };
 
   return (
-    <div className="h-[calc(100vh-2rem)] flex flex-col space-y-4">
+    <div>
       <PageHeader
         title="Standalone Forms"
         description="Create and manage shareable forms not tied to specific job openings."
@@ -171,31 +171,33 @@ const Forms = () => {
         }
       />
 
-      <div className="flex-1 overflow-y-auto min-h-0 pr-1">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {isLoading ? (
-            <FormSkeleton />
-          ) : !forms || forms.length === 0 ? (
-            <NotFound Icon={FaWpforms} message="No forms created yet." />
-          ) : !filteredForms || filteredForms.length === 0 ? (
-            <NotFound
-              Icon={FaWpforms}
-              message="No forms found matching criteria."
-            />
-          ) : (
-            <FormsList
-              forms={filteredForms}
-              isFormActive={isFormActive}
-              copiedId={copiedId}
-              actions={{
-                copyLink,
-                setFormToEdit,
-                setIsModalOpen,
-                setDeleteId,
-              }}
-            />
-          )}
-        </div>
+      <div className="space-y-6">
+        {!isLoading && (!forms || forms.length === 0) ? (
+          <NotFound Icon={FaWpforms} message="No forms created yet." />
+        ) : !isLoading && (!filteredForms || filteredForms.length === 0) ? (
+          <NotFound
+            Icon={FaWpforms}
+            message="No forms found matching criteria."
+          />
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {isLoading ? (
+              <FormSkeleton />
+            ) : (
+              <FormsList
+                forms={filteredForms}
+                isFormActive={isFormActive}
+                copiedId={copiedId}
+                actions={{
+                  copyLink,
+                  setFormToEdit,
+                  setIsModalOpen,
+                  setDeleteId,
+                }}
+              />
+            )}
+          </div>
+        )}
       </div>
 
       <RightSidebar

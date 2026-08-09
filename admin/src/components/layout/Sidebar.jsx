@@ -49,7 +49,7 @@ const Sidebar = () => {
         isSidebarOpen ? "translate-x-0" : "-translate-x-full"
       }`}
     >
-      <div className="p-6 border-b border-border flex items-center justify-between">
+      <div className="px-6 py-2.5 border-b border-border flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-foreground">Dashboard</h1>
           <p className="text-xs text-muted-foreground">Portfolio Manager</p>

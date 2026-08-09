@@ -35,29 +35,32 @@ const NotFound = React.lazy(() => import("@/features/error/NotFound"));
 
 // Initial Error Component (Keep eager or lazy)
 import ServerError from "@/features/error/ServerError";
+import Maintenance from "@/features/error/Maintenance";
 import usePortfolioStore from "@/store/usePortfolioStore";
 import { BASE_API_URL } from "@/api/axios";
 
 import { ThemeProvider } from "@/context/ThemeContext";
 
 function App() {
-  const { fetchData, config, serverError } = usePortfolioStore();
+  const { fetchHomeData, config, serverError } = usePortfolioStore();
 
   if (serverError) return <ServerError />;
 
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-      <InnerApp config={config} fetchData={fetchData} />
+      <InnerApp config={config} fetchHomeData={fetchHomeData} />
     </ThemeProvider>
   );
 }
 
-function InnerApp({ config, fetchData }) {
+function InnerApp({ config, fetchHomeData }) {
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    fetchHomeData();
+  }, [fetchHomeData]);
 
   useEffect(() => {
+    if (config?.maintenance?.enabled) return;
+
     const logVisit = async () => {
       try {
         let userAgent = navigator.userAgent;
@@ -85,7 +88,7 @@ function InnerApp({ config, fetchData }) {
     };
 
     logVisit();
-  }, []);
+  }, [config?.maintenance?.enabled]);
 
   useEffect(() => {
     if (config) {
@@ -114,6 +117,10 @@ function InnerApp({ config, fetchData }) {
       } else root.style.removeProperty("--color-secondary");
     }
   }, [config]);
+
+  if (config?.maintenance?.enabled) {
+    return <Maintenance config={config} />;
+  }
 
   return (
     <Router>

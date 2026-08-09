@@ -4,7 +4,7 @@ import { asyncHandler } from "../../utils/asyncHandler.js";
 import { ServiceService } from "./service.service.js";
 
 const createService = asyncHandler(async (req, res) => {
-    const { title, description, icon, features, plans, whyChooseMe, techStack, process, faq, cta } = req.body;
+    const { title, description, icon, features, plans, whyChooseMe, techStack, process, faq, cta, isFeatured } = req.body;
 
     const service = await ServiceService.createService({
         title,
@@ -16,7 +16,8 @@ const createService = asyncHandler(async (req, res) => {
         techStack,
         process,
         faq,
-        cta
+        cta,
+        isFeatured
     });
 
     return res.status(201).json(
@@ -42,7 +43,7 @@ const getServiceById = asyncHandler(async (req, res) => {
 
 const updateService = asyncHandler(async (req, res) => {
     const { id } = req.params;
-    const { title, description, icon, features, plans, whyChooseMe, techStack, process, faq, cta } = req.body;
+    const { title, description, icon, features, plans, whyChooseMe, techStack, process, faq, cta, isFeatured } = req.body;
 
     const service = await ServiceService.updateService(id, {
         title,
@@ -54,7 +55,8 @@ const updateService = asyncHandler(async (req, res) => {
         techStack,
         process,
         faq,
-        cta
+        cta,
+        isFeatured
     });
 
     return res.status(200).json(

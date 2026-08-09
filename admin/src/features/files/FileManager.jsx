@@ -134,11 +134,7 @@ const FileManager = ({ isModal = false, resType = "all", onSelect }) => {
   };
 
   return (
-    <div
-      className={cn(
-        isModal ? "space-y-4" : "h-[calc(100vh-2rem)] flex flex-col space-y-4"
-      )}
-    >
+    <div className={cn(isModal ? "space-y-4" : "space-y-6")}>
       <header className={cn(isModal && "mb-0")}>
         <div className={isModal ? "hidden" : ""}>
           <PageHeader
@@ -201,8 +197,7 @@ const FileManager = ({ isModal = false, resType = "all", onSelect }) => {
         )}
       </div>
 
-      {/* Content */}
-      <div className={isModal ? "" : "flex-1 overflow-y-auto min-h-0 pr-1"}>
+      <div className={isModal ? "" : "space-y-6"}>
         <FileGrid
           files={files}
           onDelete={handleDelete}

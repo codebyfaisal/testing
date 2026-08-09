@@ -89,7 +89,7 @@ const Testimonials = () => {
   };
 
   return (
-    <div className="h-[calc(100vh-2rem)] flex flex-col space-y-4">
+    <div>
       <PageHeader
         title="Testimonials"
         description="Manage client reviews and feedback."
@@ -111,30 +111,30 @@ const Testimonials = () => {
       </PageHeader>
 
       {/* Testimonials Grid */}
-      <div className="flex-1 overflow-y-auto min-h-0 pr-1">
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-          {isLoading ? (
-            <TestimonialSkeleton />
-          ) : !testimonials || testimonials.length === 0 ? (
-            <NotFound
-              Icon={FaCommentDots}
-              message="No testimonials created yet."
-              className="w-full h-full flex flex-col items-center justify-center text-muted-foreground"
-            />
-          ) : !filteredTestimonials || filteredTestimonials.length === 0 ? (
-            <NotFound
-              Icon={FaCommentDots}
-              message="No testimonials found matching criteria."
-              className="w-full h-full flex flex-col items-center justify-center text-muted-foreground"
-            />
-          ) : (
-            <TestimonialList
-              testimonials={filteredTestimonials}
-              onEdit={handleOpenModal}
-              onDelete={handleDelete}
-            />
-          )}
-        </div>
+      <div className="space-y-6">
+        {!isLoading && (!testimonials || testimonials.length === 0) ? (
+          <NotFound
+            Icon={FaCommentDots}
+            message="No testimonials created yet."
+          />
+        ) : !isLoading && (!filteredTestimonials || filteredTestimonials.length === 0) ? (
+          <NotFound
+            Icon={FaCommentDots}
+            message="No testimonials found matching criteria."
+          />
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+            {isLoading ? (
+              <TestimonialSkeleton />
+            ) : (
+              <TestimonialList
+                testimonials={filteredTestimonials}
+                onEdit={handleOpenModal}
+                onDelete={handleDelete}
+              />
+            )}
+          </div>
+        )}
       </div>
 
       <RightSidebar

@@ -11,6 +11,7 @@ import ServiceForm from "./components/ServiceForm";
 const Services = () => {
   const [searchParams] = useSearchParams();
   const {
+    updateService,
     deleteService,
     fetchServices,
     services,
@@ -40,6 +41,17 @@ const Services = () => {
     setIsModalOpen(true);
   };
 
+  const handleToggleFeature = async (service) => {
+    try {
+      await updateService(service._id, { ...service, isFeatured: !service.isFeatured });
+      toast.success(
+        `Service ${!service.isFeatured ? "featured" : "unfeatured"} successfully!`
+      );
+    } catch (error) {
+      toast.error(error.message || "Failed to update service feature status.");
+    }
+  };
+
   const handleDelete = (id) => {
     setConfirmState({
       isOpen: true,
@@ -59,7 +71,7 @@ const Services = () => {
   };
 
   return (
-    <div className="h-[calc(100vh-2rem)] flex flex-col space-y-4">
+    <div>
       <PageHeader
         title="Services"
         description="Manage the services you offer."
@@ -73,24 +85,26 @@ const Services = () => {
         }
       />
 
-      <div className="flex-1 overflow-y-auto min-h-0 pr-1">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-          {isLoading ? (
-            <ServiceSkeleton />
-          ) : !services || services.length === 0 ? (
-            <NotFound
-              Icon={FaServicestack}
-              message="No services created yet."
-              className="w-full h-full flex flex-col items-center justify-center text-muted-foreground"
-            />
-          ) : (
-            <ServiceList
-              services={services}
-              onEdit={handleOpenModal}
-              onDelete={handleDelete}
-            />
-          )}
-        </div>
+      <div className="space-y-6">
+        {!isLoading && (!services || services.length === 0) ? (
+          <NotFound
+            Icon={FaServicestack}
+            message="No services created yet."
+          />
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+            {isLoading ? (
+              <ServiceSkeleton />
+            ) : (
+              <ServiceList
+                services={services}
+                onEdit={handleOpenModal}
+                onDelete={handleDelete}
+                onToggleFeature={handleToggleFeature}
+              />
+            )}
+          </div>
+        )}
       </div>
 
       {/* Modal */}

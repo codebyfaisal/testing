@@ -6,11 +6,7 @@ import SubscriberSkeleton from "./SubscriberSkeleton";
 
 const SubscriberList = ({ subscribers, isLoading, onDelete }) => {
   if (!isLoading && (!subscribers || subscribers.length === 0)) {
-    return (
-      <div className="flex justify-center h-full items-center">
-        <NotFound Icon={FaSearch} message="No subscribers found." />
-      </div>
-    );
+    return <NotFound Icon={FaSearch} message="No subscribers found." />;
   }
 
   return (

@@ -170,7 +170,7 @@ const Visitors = () => {
 
   const handleSelectOne = (id) => {
     setSelected((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id],
     );
   };
 
@@ -215,29 +215,30 @@ const Visitors = () => {
   ];
 
   return (
-    <div className="h-[calc(100vh-2rem)] flex flex-col space-y-4 relative">
+    <div className="space-y-4 relative">
       <PageHeader
         title="Visitor Analytics"
         description="Track and analyze traffic patterns."
-      >
-        <div className="flex gap-4">
-          {stats.map((stat) => (
-            <Card
-              key={stat.label}
-              className="flex items-center gap-3"
-              padding="px-4 py-3"
-            >
-              <div className={`p-2 rounded-md ${stat.bg} ${stat.color}`}>
-                <stat.icon />
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground">{stat.label}</p>
-                <p className="font-bold text-lg leading-none">{stat.value}</p>
-              </div>
-            </Card>
-          ))}
-        </div>
-      </PageHeader>
+      />
+
+      {/* Quick Stat Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {stats.map((stat) => (
+          <Card
+            key={stat.label}
+            className="flex items-center gap-3"
+            padding="px-4 py-3"
+          >
+            <div className={`p-2 rounded-md ${stat.bg} ${stat.color}`}>
+              <stat.icon />
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">{stat.label}</p>
+              <p className="font-bold text-lg leading-none">{stat.value}</p>
+            </div>
+          </Card>
+        ))}
+      </div>
 
       {/* Main Content Card */}
       {/* Toolbar */}
@@ -310,11 +311,11 @@ const Visitors = () => {
                   {option.name === "ip"
                     ? "IP Address"
                     : option.name === "path"
-                    ? "Page Path"
-                    : option.name === "ua"
-                    ? "User Agent"
-                    : option.name.charAt(0).toUpperCase() +
-                      option.name.slice(1)}
+                      ? "Page Path"
+                      : option.name === "ua"
+                        ? "User Agent"
+                        : option.name.charAt(0).toUpperCase() +
+                          option.name.slice(1)}
                 </label>
                 <Input
                   type={
