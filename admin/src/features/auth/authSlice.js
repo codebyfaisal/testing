@@ -91,17 +91,44 @@ export const createAuthSlice = (set) => ({
         }
     },
 
-    changePassword: async (data) => {
-        set({ isLoadingAuth: true });
+    getLoginHistory: async () => {
         try {
-            await authService.changePassword(data);
-            set({ isLoadingAuth: false });
+            const data = await authService.getLoginHistory();
+            return data;
+        } catch (error) {
+            console.error("Failed to fetch login history:", error);
+            return { sessions: [], activeDevicesCount: 0, totalLogins30Days: 0 };
+        }
+    },
+
+    revokeSession: async (sessionId) => {
+        try {
+            await authService.revokeSession(sessionId);
         } catch (error) {
             const message = getErrorMessage(error);
-            set({ authError: message, isLoadingAuth: false });
             throw new Error(message);
         }
     },
+
+    revokeAllOtherSessions: async () => {
+        try {
+            await authService.revokeAllOtherSessions();
+        } catch (error) {
+            const message = getErrorMessage(error);
+            throw new Error(message);
+        }
+    },
+
+    revokeAllSessions: async () => {
+        try {
+            await authService.revokeAllSessions();
+            set({ user: null });
+        } catch (error) {
+            const message = getErrorMessage(error);
+            throw new Error(message);
+        }
+    },
+
     resetAuthLoading: () => {
         set({ isLoadingAuth: true });
     },

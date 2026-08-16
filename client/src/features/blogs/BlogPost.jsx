@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import axios from "@/api/axios";
 import usePortfolioStore from "@/store/usePortfolioStore";
 import { cn } from "@/utils/cn";
+import { sanitizeHtml } from "@/utils/sanitizeHtml";
 import { NotFound, Skeleton, SEO } from "@/components";
 import LikeButton from "./components/LikeButton";
 import { FaArrowLeft, FaCalendar, FaEye, FaHashtag } from "react-icons/fa";
@@ -208,6 +209,7 @@ const BlogPost = () => {
                     src={post.coverImage}
                     alt={post.title}
                     className="w-full h-full object-cover"
+                    loading="lazy"
                   />
                 </div>
               )}
@@ -218,7 +220,7 @@ const BlogPost = () => {
                   "prose prose-lg max-w-none dark:prose-invert prose-headings:text-foreground prose-p:text-muted-foreground prose-a:text-primary hover:prose-a:text-primary/80 overflow-hidden",
                   isRounded && "prose-img:rounded-3xl",
                 )}
-                dangerouslySetInnerHTML={{ __html: post.content }}
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.content) }}
                 id="blog-content"
               />
             </article>

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import useDashboardStore from "@/store/useDashboardStore";
-import { FaPlus } from "react-icons/fa";
+import { FaPlus, FaServicestack } from "react-icons/fa";
 import toast from "react-hot-toast";
 import { useSearchParams } from "react-router-dom";
-import { Button, ConfirmationModal, PageHeader } from "@/components";
+import { Button, ConfirmationModal, PageHeader, NotFound } from "@/components";
 import ServiceSkeleton from "./components/ServiceSkeleton";
 import ServiceList from "./components/ServiceList";
 import ServiceForm from "./components/ServiceForm";
@@ -43,9 +43,12 @@ const Services = () => {
 
   const handleToggleFeature = async (service) => {
     try {
-      await updateService(service._id, { ...service, isFeatured: !service.isFeatured });
+      await updateService(service._id, {
+        ...service,
+        isFeatured: !service.isFeatured,
+      });
       toast.success(
-        `Service ${!service.isFeatured ? "featured" : "unfeatured"} successfully!`
+        `Service ${!service.isFeatured ? "featured" : "unfeatured"} successfully!`,
       );
     } catch (error) {
       toast.error(error.message || "Failed to update service feature status.");
@@ -87,10 +90,7 @@ const Services = () => {
 
       <div className="space-y-6">
         {!isLoading && (!services || services.length === 0) ? (
-          <NotFound
-            Icon={FaServicestack}
-            message="No services created yet."
-          />
+          <NotFound Icon={FaServicestack} message="No services created yet." />
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 gap-6">
             {isLoading ? (

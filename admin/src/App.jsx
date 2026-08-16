@@ -24,6 +24,7 @@ import {
   JobApplications,
   Subscribers,
   Forms,
+  Security,
 } from "@/pages";
 import { Layout, ErrorBoundary, LogoPulse } from "@/components";
 
@@ -231,6 +232,14 @@ function App() {
               element={
                 <ErrorBoundary>
                   <Forms />
+                </ErrorBoundary>
+              }
+            />
+            <Route
+              path="security"
+              element={
+                <ErrorBoundary>
+                  <Security />
                 </ErrorBoundary>
               }
             />

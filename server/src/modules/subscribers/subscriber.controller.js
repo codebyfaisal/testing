@@ -16,7 +16,6 @@ const subscribe = asyncHandler(async (req, res) => {
 
 const getSubscribers = asyncHandler(async (req, res) => {
     const subscribers = await SubscriberService.getSubscribers();
-    console.log(subscribers);
     return res.status(200).json(
         new ApiResponse(200, subscribers, "Subscribers fetched successfully")
     );

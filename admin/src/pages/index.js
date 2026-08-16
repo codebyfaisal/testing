@@ -14,3 +14,4 @@ export { default as Jobs } from "@/features/jobs/Jobs";
 export { default as JobApplications } from "@/features/jobs/Applications";
 export { default as Subscribers } from "@/features/subscribers/Subscribers";
 export { default as Forms } from "@/features/forms/Forms";
+export { default as Security } from "@/features/security/Security";

@@ -1,8 +1,10 @@
 export const BASE_API_URL =
-  import.meta.env.VITE_BASE_API_URL || "http://localhost:4000/api/v1";
+  import.meta.env.VITE_BASE_API_URL ||
+  (import.meta.env.PROD ? "/api/v1" : "http://localhost:4000/api/v1");
 
 export const CLIENT_URL =
-  import.meta.env.VITE_CLIENT_URL || "http://localhost:5174";
+  import.meta.env.VITE_CLIENT_URL ||
+  (import.meta.env.PROD ? window.location.origin : "http://localhost:5174");
 
 if (import.meta.env.DEV && !import.meta.env.VITE_BASE_API_URL) {
   console.warn(

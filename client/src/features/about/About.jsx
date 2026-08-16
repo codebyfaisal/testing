@@ -4,6 +4,7 @@ import { PageHeader, Testimonials, Button, SEO, Skeleton } from "@/components";
 import { FaFileDownload, FaGraduationCap, FaBriefcase } from "react-icons/fa";
 import { GiSkills } from "react-icons/gi";
 import { cn } from "@/utils/cn";
+import { sanitizeHtml } from "@/utils/sanitizeHtml";
 import { optimizeImage } from "@/utils/imageOptimizer";
 import { siteConfig } from "@/config/siteConfig";
 
@@ -259,7 +260,9 @@ const About = () => {
                     {skill.icon &&
                       (skill.icon.includes("svg") ? (
                         <div
-                          dangerouslySetInnerHTML={{ __html: skill.icon }}
+                          dangerouslySetInnerHTML={{
+                            __html: sanitizeHtml(skill.icon),
+                          }}
                           className="w-6 h-6 [&>svg]:w-full [&>svg]:h-full [&>svg]:fill-foreground [&>svg]:opacity-70"
                         />
                       ) : (

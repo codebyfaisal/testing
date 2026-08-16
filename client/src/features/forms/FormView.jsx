@@ -66,14 +66,6 @@ const FormView = () => {
     };
   };
 
-  console.log(
-    new Date(form.expiryDate) < new Date(),
-    new Date(form.expiryDate),
-    new Date(),
-
-    form.expiryDate,
-  );
-
   return (
     <section className="space-y-8 max-w-4xl mx-auto">
       <PageHeader

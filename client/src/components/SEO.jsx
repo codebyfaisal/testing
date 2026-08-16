@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-import { siteConfig } from "@/config/siteConfig";
 import { seoConfig } from "@/config/seoConfig";
 
 const SEO = ({
@@ -9,6 +8,7 @@ const SEO = ({
   image,
   author,
   twitterHandle,
+  schemaData,
 }) => {
   const siteTitle = seoConfig.siteTitle;
   const pageTitle = title
@@ -19,8 +19,12 @@ const SEO = ({
   const metaAuthor = author || seoConfig.author;
   const metaImage = image || seoConfig.image;
   const metaTwitter = twitterHandle || seoConfig.twitterHandle;
+
+  // Clean Canonical URL (Origin + Pathname, stripping query parameters and hash)
   const canonicalUrl =
-    typeof window !== "undefined" ? window.location.href : "";
+    typeof window !== "undefined"
+      ? window.location.origin + window.location.pathname
+      : "";
 
   useEffect(() => {
     document.title = pageTitle;
@@ -64,7 +68,7 @@ const SEO = ({
     updateMeta("twitter:card", "summary_large_image");
     if (metaTwitter) updateMeta("twitter:creator", metaTwitter);
 
-    // Canonical
+    // Clean Canonical Link
     updateLink("canonical", canonicalUrl);
 
     // Hreflang
@@ -81,6 +85,20 @@ const SEO = ({
       element.setAttribute("href", href);
     };
     updateHreflang("en", canonicalUrl);
+
+    // Dynamic JSON-LD Schema
+    if (schemaData) {
+      let script = document.querySelector(
+        'script[type="application/ld+json"]#dynamic-schema',
+      );
+      if (!script) {
+        script = document.createElement("script");
+        script.setAttribute("type", "application/ld+json");
+        script.setAttribute("id", "dynamic-schema");
+        document.head.appendChild(script);
+      }
+      script.textContent = JSON.stringify(schemaData);
+    }
   }, [
     pageTitle,
     metaDescription,
@@ -89,6 +107,7 @@ const SEO = ({
     metaImage,
     metaTwitter,
     canonicalUrl,
+    schemaData,
   ]);
 
   return null;

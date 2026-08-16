@@ -18,6 +18,7 @@ import {
   FaInbox,
   FaWpforms,
   FaSignOutAlt,
+  FaShieldAlt,
 } from "react-icons/fa";
 import clsx from "clsx";
 import useDashboardStore from "@/store/useDashboardStore";
@@ -39,6 +40,7 @@ const Sidebar = () => {
     { path: "/forms", icon: FaWpforms, label: "Forms" },
     { path: "/files", icon: FaFolder, label: "File Manager" },
     { path: "/visitors", icon: FaUsers, label: "Visitors" },
+    { path: "/security", icon: FaShieldAlt, label: "Security" },
     { path: "/user", icon: FaUser, label: "Profile" },
     { path: "/configuration", icon: FaCog, label: "Configuration" },
   ];

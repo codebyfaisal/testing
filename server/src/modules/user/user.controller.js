@@ -129,17 +129,5 @@ const getHomeData = asyncHandler(async (req, res) => {
     );
 });
 
-const changeCurrentPassword = asyncHandler(async (req, res) => {
-    const { oldPassword, newPassword } = req.body;
-
-    if (!oldPassword || !newPassword) {
-        throw new ApiError(400, "Old password and new password are required");
-    }
-
-    await AuthService.changePassword(req.user._id, oldPassword, newPassword);
-
-    return res.status(200).json(new ApiResponse(200, {}, "Password changed successfully"));
-});
-
-export { getUser, updateUser, getPortfolioProfile, getHomeData, changeCurrentPassword };
+export { getUser, updateUser, getPortfolioProfile, getHomeData };
 

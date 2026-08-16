@@ -6,6 +6,7 @@ import {
   FaFilter,
   FaTimes,
   FaSearch,
+  FaProjectDiagram,
 } from "react-icons/fa";
 import {
   Button,
@@ -13,6 +14,7 @@ import {
   PageHeader,
   RightSidebar,
   Input,
+  NotFound,
 } from "@/components";
 import ProjectSkeleton from "./components/ProjectSkeleton";
 import toast from "react-hot-toast";

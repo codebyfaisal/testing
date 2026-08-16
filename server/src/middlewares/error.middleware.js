@@ -2,7 +2,9 @@ import { ApiError } from "../utils/ApiError.js";
 import { NODE_ENV } from "../constants.js";
 
 const errorHandler = (err, req, res, next) => {
-    console.log(err);
+    if (NODE_ENV === "development") {
+        console.error("Express Error Handler:", err);
+    }
     let error = err;
 
     if (!(error instanceof ApiError)) {

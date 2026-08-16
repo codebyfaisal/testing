@@ -1,6 +1,6 @@
 import mongoose, { Schema } from "mongoose";
-import bcrypt from "bcryptjs";
 import { commonStr, commonNum } from "../common/common.model.js";
+
 const experienceSchema = new Schema({
     company: { ...commonStr, required: true },
     role: { ...commonStr, required: true },

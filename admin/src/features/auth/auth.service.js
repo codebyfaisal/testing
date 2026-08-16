@@ -3,12 +3,18 @@ import api from "@/api/axios";
 const authService = {
     login: async (credentials) => {
         const response = await api.post("/auth/login", credentials);
-
         return response.data.data;
     },
     logout: async () => {
         const response = await api.post("/auth/logout");
         return response.data.data;
+    },
+    pingSessionLogout: async () => {
+        try {
+            await api.post("/auth/sessions/ping-logout");
+        } catch (err) {
+            // Ignore unload errors
+        }
     },
     getUser: async () => {
         try {
@@ -27,8 +33,20 @@ const authService = {
         const response = await api.get("/auth/admin-exists");
         return response.data.data;
     },
-    changePassword: async (data) => {
-        const response = await api.post("/auth/me/change-password", data);
+    getLoginHistory: async () => {
+        const response = await api.get("/auth/login-history");
+        return response.data.data;
+    },
+    revokeSession: async (sessionId) => {
+        const response = await api.post(`/auth/sessions/revoke/${sessionId}`);
+        return response.data.data;
+    },
+    revokeAllOtherSessions: async () => {
+        const response = await api.post("/auth/sessions/revoke-others");
+        return response.data.data;
+    },
+    revokeAllSessions: async () => {
+        const response = await api.post("/auth/sessions/revoke-all");
         return response.data.data;
     },
 };

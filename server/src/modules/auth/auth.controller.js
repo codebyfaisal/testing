@@ -16,7 +16,11 @@ const loginUser = asyncHandler(async (req, res) => {
 
     if (!password) throw new ApiError(400, "Password is required");
 
-    const { user, accessToken, refreshToken } = await AuthService.loginUser(password);
+    const rawIp = req.headers["x-forwarded-for"] || req.socket.remoteAddress || req.ip || "127.0.0.1";
+    const ip = rawIp.split(",")[0].trim();
+    const userAgent = req.headers["user-agent"] || "Unknown";
+
+    const { user, accessToken, refreshToken } = await AuthService.loginUser(password, { ip, userAgent });
 
     const options = {
         httpOnly: true,
@@ -40,7 +44,7 @@ const loginUser = asyncHandler(async (req, res) => {
 });
 
 const logoutUser = asyncHandler(async (req, res) => {
-    await AuthService.logoutUser(req.user._id);
+    await AuthService.logoutUser(req.user._id, req.sessionId);
 
     const options = {
         httpOnly: true,
@@ -55,18 +59,51 @@ const logoutUser = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, {}, "User logged Out"));
 });
 
-const changePassword = asyncHandler(async (req, res) => {
-    const { oldPassword, newPassword, confirmNewPassword } = req.body;
+const pingSessionLogout = asyncHandler(async (req, res) => {
+    if (req.sessionId && req.user?._id) {
+        await AuthService.logoutUser(req.user._id, req.sessionId);
+    }
+    return res.status(200).json(new ApiResponse(200, {}, "Session marked inactive"));
+});
 
-    if (!oldPassword) throw new ApiError(400, "oldPassword is required");
-    if (!newPassword) throw new ApiError(400, "newPassword is required");
-    if (!confirmNewPassword) throw new ApiError(400, "confirmNewPassword is required");
-    if (newPassword !== confirmNewPassword) throw new ApiError(400, "Passwords do not match");
-    if (newPassword === oldPassword) throw new ApiError(400, "New password cannot be the same as the old password");
+const getLoginHistory = asyncHandler(async (req, res) => {
+    const history = await AuthService.getLoginHistory(req.user._id, req.sessionId);
+    return res.status(200).json(
+        new ApiResponse(200, history, "Login history and active sessions fetched successfully")
+    );
+});
 
-    await AuthService.changePassword(req.user._id, oldPassword, newPassword);
+const revokeSession = asyncHandler(async (req, res) => {
+    const { sessionId } = req.params;
+    if (!sessionId) throw new ApiError(400, "Session ID is required");
 
-    return res.status(200).json(new ApiResponse(200, {}, "Password changed successfully"));
+    await AuthService.revokeSession(req.user._id, sessionId);
+    return res.status(200).json(
+        new ApiResponse(200, {}, "Device session revoked successfully")
+    );
+});
+
+const revokeAllOtherSessions = asyncHandler(async (req, res) => {
+    await AuthService.revokeAllOtherSessions(req.user._id, req.sessionId);
+    return res.status(200).json(
+        new ApiResponse(200, {}, "All other device sessions revoked successfully")
+    );
+});
+
+const revokeAllSessions = asyncHandler(async (req, res) => {
+    await AuthService.revokeAllSessions(req.user._id);
+
+    const options = {
+        httpOnly: true,
+        secure: IS_SECURE,
+        sameSite: IS_SECURE ? "none" : "lax"
+    };
+
+    return res
+        .status(200)
+        .clearCookie("accessToken", options)
+        .clearCookie("refreshToken", options)
+        .json(new ApiResponse(200, {}, "All device sessions revoked"));
 });
 
 const refreshAccessToken = asyncHandler(async (req, res) => {
@@ -97,5 +134,14 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
         );
 });
 
-export { loginUser, logoutUser, checkAdminExists, changePassword, refreshAccessToken };
-
+export {
+    loginUser,
+    logoutUser,
+    pingSessionLogout,
+    checkAdminExists,
+    getLoginHistory,
+    revokeSession,
+    revokeAllOtherSessions,
+    revokeAllSessions,
+    refreshAccessToken,
+};
