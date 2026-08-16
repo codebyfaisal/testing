@@ -38,5 +38,8 @@ export const CLOUDINARY_API_KEY = process.env.CLOUDINARY_API_KEY;
 export const CLOUDINARY_API_SECRET = process.env.CLOUDINARY_API_SECRET;
 export const CLOUDINARY_FOLDER = process.env.CLOUDINARY_FOLDER;
 
-export const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
+export const RATE_LIMIT_WINDOW_MS = Number(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000;
+export const RATE_LIMIT_GLOBAL_MAX = Number(process.env.RATE_LIMIT_GLOBAL_MAX) || Number(process.env.API_RATE_LIMIT_MAX) || 100000;
+export const RATE_LIMIT_STRICT_MAX = Number(process.env.RATE_LIMIT_STRICT_MAX) || 100000;
+
 export const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;

@@ -2,8 +2,8 @@ import express from "express";
 import helmet from "helmet";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import rateLimit from "express-rate-limit";
 import allowOrigins from "./utils/allowOrigins.js";
+import { globalLimiter, strictLimiter } from "./middlewares/rateLimiter.middleware.js";
 
 const app = express();
 
@@ -15,29 +15,6 @@ app.use(
         credentials: true,
     })
 );
-
-// Unlimited / High Rate Limiting for Development & Testing
-const globalLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 100000,
-    standardHeaders: true,
-    legacyHeaders: false,
-    message: {
-        status: 429,
-        message: "Too many requests from this IP, please try again after 15 minutes.",
-    },
-});
-
-const strictLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 100000,
-    standardHeaders: true,
-    legacyHeaders: false,
-    message: {
-        status: 429,
-        message: "Too many attempts from this IP, please try again after 15 minutes.",
-    },
-});
 
 app.use("/api", globalLimiter);
 
